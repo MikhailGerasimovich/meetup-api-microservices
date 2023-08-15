@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { TagRepository } from './tag.repository';
 
-@Module({})
+@Module({
+  providers: [TagRepository],
+  exports: [TagRepository],
+})
 export class TagModule {}
