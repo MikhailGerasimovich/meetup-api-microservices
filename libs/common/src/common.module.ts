@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CommonService } from './common.service';
+import { JoiValidationPipe } from './pipes/joi-validation.pipe';
 
 @Module({
-  providers: [CommonService],
-  exports: [CommonService],
+  providers: [JoiValidationPipe],
+  exports: [JoiValidationPipe],
 })
 export class CommonModule {}
