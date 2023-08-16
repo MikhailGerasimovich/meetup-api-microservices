@@ -1,4 +1,4 @@
-export class UpdateTagDto {
+export class UpdateMeetupDto {
   title?: string;
   description?: string;
   date?: string;

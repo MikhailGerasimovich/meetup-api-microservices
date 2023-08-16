@@ -20,6 +20,13 @@ export class TagRepository {
     return tag;
   }
 
+  async getByTitle(title: string) {
+    const tag = await this.prisma.tags.findUnique({
+      where: { title },
+    });
+    return tag;
+  }
+
   async create(tagCreationAttrs: TagCreationAttrs): Promise<Tag> {
     const createdTag = await this.prisma.tags.create({
       data: {

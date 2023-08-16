@@ -20,6 +20,11 @@ export class TagService {
     return tag;
   }
 
+  async getByTitle(title: string): Promise<Tag> {
+    const tag = await this.tagRepository.getByTitle(title);
+    return tag;
+  }
+
   async create(createTagDto: CreateTagDto): Promise<Tag> {
     const tagCreationAttrs: TagCreationAttrs = {
       title: createTagDto.title,

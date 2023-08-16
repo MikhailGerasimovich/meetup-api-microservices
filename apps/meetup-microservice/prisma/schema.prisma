@@ -8,11 +8,11 @@ datasource db {
 }
 
 model Meetups {
-  id          Int      @id @unique @default(autoincrement())
+  id          Int    @id @unique @default(autoincrement())
   title       String
   description String
-  date        DateTime
-  palce       String
+  date        String
+  place       String
 
   tags        MeetupsToTags[]
   members     Members[]
