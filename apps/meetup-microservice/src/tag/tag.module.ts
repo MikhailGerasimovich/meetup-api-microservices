@@ -8,6 +8,6 @@ import { DatabaseModule } from '../database/database.module';
   imports: [DatabaseModule],
   providers: [TagRepository, TagService],
   controllers: [TagController],
-  exports: [],
+  exports: [TagService],
 })
 export class TagModule {}
