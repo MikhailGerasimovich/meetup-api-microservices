@@ -19,7 +19,7 @@ export class TagService {
   }
 
   async create(createTagDto: CreateTagDto): Promise<Tags> {
-    const createdTag = await this.create(createTagDto);
+    const createdTag = await this.tagRepository.create(createTagDto);
     return createdTag;
   }
 
@@ -29,7 +29,7 @@ export class TagService {
       throw new BadRequestException(`The specified tag does not exist`);
     }
 
-    const updatedTag = await this.update(id, updateTagDto);
+    const updatedTag = await this.tagRepository.update(id, updateTagDto);
     return updatedTag;
   }
 

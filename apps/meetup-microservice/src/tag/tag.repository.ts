@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, Tags } from '@prisma/client';
+import { Tags } from '@prisma/client';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { PrismaService } from '../database/prisma.service';
 
 @Injectable()
 export class TagRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async readAll(): Promise<Tags[]> {
     const tags = await this.prisma.tags.findMany();
