@@ -1,36 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { Tags } from '@prisma/client';
-import { CreateTagDto } from './dto/create-tag.dto';
-import { UpdateTagDto } from './dto/update-tag.dto';
 import { PrismaService } from '../database/prisma.service';
+import { Tag } from './types/tag.entity';
+import { TagCreationAttrs } from './types/tag.creation-attrs';
+import { TagUpdateAttrs } from './types/tag.update-attrs';
 
 @Injectable()
 export class TagRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async readAll(): Promise<Tags[]> {
+  async readAll(): Promise<Tag[]> {
     const tags = await this.prisma.tags.findMany();
     return tags;
   }
 
-  async readById(id: string): Promise<Tags> {
+  async readById(id: string): Promise<Tag> {
     const tag = await this.prisma.tags.findUnique({
       where: { id: Number(id) },
     });
     return tag;
   }
 
-  async create(createTagDto: CreateTagDto): Promise<Tags> {
+  async create(tagCreationAttrs: TagCreationAttrs): Promise<Tag> {
     const createdTag = await this.prisma.tags.create({
-      data: createTagDto,
+      data: {
+        title: tagCreationAttrs.title,
+      },
     });
     return createdTag;
   }
 
-  async update(id: string, updateTagDto: UpdateTagDto): Promise<Tags> {
+  async update(id: string, tagUpdateAttrs: TagUpdateAttrs): Promise<Tag> {
     const updatedTag = await this.prisma.tags.update({
       where: { id: Number(id) },
-      data: updateTagDto,
+      data: {
+        title: tagUpdateAttrs.title,
+      },
     });
     return updatedTag;
   }
