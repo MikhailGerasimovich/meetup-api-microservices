@@ -10,12 +10,12 @@ import {
   Delete,
 } from '@nestjs/common';
 import { TagService } from './tag.service';
-import { Tags } from '@prisma/client';
 import { JoiValidationPipe } from '@app/common';
 import { CreateTagSchema } from './schemas/create-tag.schema';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagSchema } from './schemas/update-tag.schema';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { TagFroontend } from './types/tag.frontend';
 
 @Controller('tag')
 export class TagController {
@@ -23,25 +23,25 @@ export class TagController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async readAll(): Promise<Tags[]> {
+  async readAll(): Promise<TagFroontend[]> {
     const tags = await this.tagService.readAll();
-    return tags;
+    return tags.map((tag) => new TagFroontend(tag));
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async readById(@Param('id') id: string): Promise<Tags> {
+  async readById(@Param('id') id: string): Promise<TagFroontend> {
     const tag = await this.tagService.readById(id);
-    return tag;
+    return new TagFroontend(tag);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body(new JoiValidationPipe(CreateTagSchema)) createTagDto: CreateTagDto,
-  ): Promise<Tags> {
+  ): Promise<TagFroontend> {
     const createdTag = await this.tagService.create(createTagDto);
-    return createdTag;
+    return new TagFroontend(createdTag);
   }
 
   @Put(':id')
@@ -49,9 +49,9 @@ export class TagController {
   async update(
     @Param('id') id: string,
     @Body(new JoiValidationPipe(UpdateTagSchema)) updateTagDto: UpdateTagDto,
-  ): Promise<Tags> {
+  ): Promise<TagFroontend> {
     const updatedTag = await this.tagService.update(id, updateTagDto);
-    return updatedTag;
+    return new TagFroontend(updatedTag);
   }
 
   @Delete(':id')
