@@ -1,9 +1,14 @@
 import * as Joi from 'joi';
-import { ReadAllTagDto } from '../dto/read-all-tag.dto';
 import { PaginationDto, SortingDto } from '@app/common';
+import { ReadAllMeetupDto } from '../dto/read-all-meetup.dto';
 
-export const ReadAllTagSchema = Joi.object<ReadAllTagDto>({
+export const ReadAllMeetupSchema = Joi.object<ReadAllMeetupDto>({
   title: Joi.string().optional(),
+  description: Joi.string().optional(),
+  date: Joi.string().optional(),
+  place: Joi.string().optional(),
+  tags: Joi.array().items(Joi.string()).optional(),
+  organizerId: Joi.number().optional(),
 
   pagination: Joi.object<PaginationDto>({
     page: Joi.number().min(1).optional(),

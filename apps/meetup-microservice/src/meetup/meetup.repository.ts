@@ -3,13 +3,31 @@ import { PrismaService } from '../database/prisma.service';
 import { Meetup } from './types/meetup.entity';
 import { MeetupCreationAttrs } from './types/meetup.creation-attrs';
 import { MeetupUpdateAttrs } from './types/meetup.update.attrs';
+import { IReadAllMeetupOptions } from './types/read-all-meetup.options';
+import { ReadAllResult, defaultPagination, defaultSorting, offset } from '@app/common';
+import { getMeetupFilters } from './filters/read-all-meetup.filter';
 
 @Injectable()
 export class MeetupRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async readAll(): Promise<Meetup[]> {
-    const meetups = await this.prisma.meetups.findMany({
+  async readAll(readAllOptions: IReadAllMeetupOptions): Promise<ReadAllResult<Meetup>> {
+    const page = readAllOptions?.pagination?.page || defaultPagination.page;
+    const size = readAllOptions?.pagination?.size || defaultPagination.size;
+
+    const column = readAllOptions?.sorting?.column ?? defaultSorting.column;
+    const direction = readAllOptions?.sorting?.direction ?? defaultSorting.direction;
+
+    const filters = getMeetupFilters(readAllOptions.filters);
+
+    const records = await this.prisma.meetups.findMany({
+      where: { ...filters.meetupFilters, ...filters.tagFilters },
+      skip: offset(page, size),
+      take: Number(size),
+      orderBy: {
+        [column]: direction,
+      },
+
       include: {
         tags: {
           select: {
@@ -18,7 +36,12 @@ export class MeetupRepository {
         },
       },
     });
-    return meetups;
+
+    const totalRecordsNumber = await this.prisma.meetups.count({
+      where: { ...filters.meetupFilters, ...filters.tagFilters },
+    });
+
+    return { totalRecordsNumber, records };
   }
 
   async readById(id: string): Promise<Meetup> {

@@ -1,11 +1,13 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Body, Post, Put, Delete } from '@nestjs/common';
-import { JoiValidationPipe } from '@app/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Body, Post, Put, Delete, Query } from '@nestjs/common';
+import { JoiValidationPipe, ReadAllResult } from '@app/common';
 import { MeetupService } from './meetup.service';
 import { MeetupFrontend } from './types/meetup.frontend';
 import { CreateMeetupSchema } from './schemas/create-meetup.schema';
 import { CreateMeetupDto } from './dto/create-meetup.dto';
 import { UpdateMeetupSchema } from './schemas/update-meetup.schema';
 import { UpdateMeetupDto } from './dto/update-meetup.dto';
+import { ReadAllMeetupSchema } from './schemas/read-all-meetup.schema';
+import { ReadAllMeetupDto } from './dto/read-all-meetup.dto';
 
 @Controller('meetup')
 export class MeetupController {
@@ -13,9 +15,15 @@ export class MeetupController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async readAll(): Promise<MeetupFrontend[]> {
-    const meetups = await this.meetupService.readAll();
-    return meetups.map((meetup) => new MeetupFrontend(meetup));
+  async readAll(
+    @Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto,
+  ): Promise<ReadAllResult<MeetupFrontend>> {
+    const { pagination, sorting, ...filters } = readAllMeetupDto;
+    const meetups = await this.meetupService.readAll({ pagination, sorting, filters });
+    return {
+      totalRecordsNumber: meetups.totalRecordsNumber,
+      records: meetups.records.map((meetup) => new MeetupFrontend(meetup)),
+    };
   }
 
   @Get(':id')
