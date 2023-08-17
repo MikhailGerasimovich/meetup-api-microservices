@@ -5,14 +5,16 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 import { Tag } from './types/tag.entity';
 import { TagCreationAttrs } from './types/tag.creation-attrs';
 import { TagUpdateAttrs } from './types/tag.update-attrs';
+import { IReadAllTagOptions } from './types/read-all-tag.options';
+import { ReadAllResult } from '@app/common';
 
 @Injectable()
 export class TagService {
   constructor(private readonly tagRepository: TagRepository) {}
 
-  async readAll(): Promise<Tag[]> {
-    const tags = await this.tagRepository.readAll();
-    return tags;
+  async readAll(readAllOptions: IReadAllTagOptions): Promise<ReadAllResult<Tag>> {
+    const readAllTags = await this.tagRepository.readAll(readAllOptions);
+    return readAllTags;
   }
 
   async readById(id: string): Promise<Tag> {

@@ -1,11 +1,13 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Body, Post, Put, Delete } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Body, Post, Put, Delete, Query } from '@nestjs/common';
 import { TagService } from './tag.service';
-import { JoiValidationPipe } from '@app/common';
+import { JoiValidationPipe, ReadAllResult } from '@app/common';
 import { CreateTagSchema } from './schemas/create-tag.schema';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagSchema } from './schemas/update-tag.schema';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { TagFrontend } from './types/tag.frontend';
+import { ReadAllTagSchema } from './schemas/read-all-tag.schema';
+import { ReadAllTagDto } from './dto/read-all-tag.dto';
 
 @Controller('tag')
 export class TagController {
@@ -13,9 +15,15 @@ export class TagController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async readAll(): Promise<TagFrontend[]> {
-    const tags = await this.tagService.readAll();
-    return tags.map((tag) => new TagFrontend(tag));
+  async readAll(
+    @Query(new JoiValidationPipe(ReadAllTagSchema)) readAllTagDto: ReadAllTagDto,
+  ): Promise<ReadAllResult<TagFrontend>> {
+    const { pagination, sorting, ...filters } = readAllTagDto;
+    const tags = await this.tagService.readAll({ pagination, sorting, filters });
+    return {
+      totalRecordsNumber: tags.totalRecordsNumber,
+      records: tags.records.map((tag) => new TagFrontend(tag)),
+    };
   }
 
   @Get(':id')

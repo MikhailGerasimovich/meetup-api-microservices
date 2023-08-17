@@ -1,6 +1,6 @@
 export * from './common.module';
 export * from './pipes/joi-validation.pipe';
-export * from './read-all/pagination/types/pagination.frontend';
+export * from './read-all/pagination/types/read-all.type';
 export * from './read-all/pagination/default.pagination';
 export * from './read-all/pagination/dto/pagination.dto';
 export * from './read-all/pagination/types/pagination.options';
