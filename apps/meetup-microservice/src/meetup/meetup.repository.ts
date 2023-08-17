@@ -9,13 +9,28 @@ export class MeetupRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async readAll(): Promise<Meetup[]> {
-    const meetups = await this.prisma.meetups.findMany();
+    const meetups = await this.prisma.meetups.findMany({
+      include: {
+        tags: {
+          select: {
+            tag: true,
+          },
+        },
+      },
+    });
     return meetups;
   }
 
   async readById(id: string): Promise<Meetup> {
     const meetup = await this.prisma.meetups.findUnique({
       where: { id: Number(id) },
+      include: {
+        tags: {
+          select: {
+            tag: true,
+          },
+        },
+      },
     });
     return meetup;
   }
@@ -32,6 +47,14 @@ export class MeetupRepository {
           create: meetupCreationAttrs.tags.map((tag) => ({
             tag: { connect: { id: Number(tag.id) } },
           })),
+        },
+      },
+
+      include: {
+        tags: {
+          select: {
+            tag: true,
+          },
         },
       },
     });
@@ -57,11 +80,27 @@ export class MeetupRepository {
     const updatedMeetup = await this.prisma.meetups.update({
       where: { id: Number(id) },
       data: data,
+      include: {
+        tags: {
+          select: {
+            tag: true,
+          },
+        },
+      },
     });
     return updatedMeetup;
   }
 
   async deleteById(id: string): Promise<void> {
+    await this.prisma.meetups.update({
+      where: { id: Number(id) },
+      data: {
+        tags: {
+          deleteMany: { meetupId: Number(id) },
+        },
+      },
+    });
+
     await this.prisma.meetups.delete({
       where: { id: Number(id) },
     });

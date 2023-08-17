@@ -13,15 +13,15 @@ export class MeetupFrontend {
   }[];
 
   constructor(meetup: Meetup) {
-    this.id = meetup.id;
-    this.title = meetup.title;
-    this.description = meetup.description;
-    this.date = meetup.date;
-    this.place = meetup.place;
-    this.organiserId = meetup.organizerId;
-    this.tags = meetup?.tags?.map((tag) => ({
-      id: tag.id,
-      name: tag.title,
+    this.id = meetup?.id;
+    this.title = meetup?.title;
+    this.description = meetup?.description;
+    this.date = meetup?.date;
+    this.place = meetup?.place;
+    this.organiserId = meetup?.organizerId;
+    this.tags = meetup?.tags?.map((obj) => ({
+      id: obj.tag.id,
+      title: obj.tag.title,
     }));
   }
 }
