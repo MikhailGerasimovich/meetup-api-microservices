@@ -7,6 +7,8 @@ import { TagService } from '../tag/tag.service';
 import { Tag } from '../tag/types/tag.entity';
 import { UpdateMeetupDto } from './dto/update-meetup.dto';
 import { MeetupUpdateAttrs } from './types/meetup.update.attrs';
+import { IReadAllMeetupOptions } from './types/read-all-meetup.options';
+import { ReadAllResult } from '@app/common';
 
 @Injectable()
 export class MeetupService {
@@ -15,9 +17,9 @@ export class MeetupService {
     private readonly tagService: TagService,
   ) {}
 
-  async readAll(): Promise<Meetup[]> {
-    const meetups = await this.meetupRepository.readAll();
-    return meetups;
+  async readAll(readAllOptions: IReadAllMeetupOptions): Promise<ReadAllResult<Meetup>> {
+    const readAllMeetups = await this.meetupRepository.readAll(readAllOptions);
+    return readAllMeetups;
   }
 
   async readById(id: string): Promise<Meetup> {

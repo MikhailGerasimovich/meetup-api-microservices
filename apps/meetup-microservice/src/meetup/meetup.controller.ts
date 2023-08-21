@@ -1,52 +1,49 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Body, Post, Put, Delete } from '@nestjs/common';
-import { JoiValidationPipe } from '@app/common';
+import { Controller } from '@nestjs/common';
 import { MeetupService } from './meetup.service';
 import { MeetupFrontend } from './types/meetup.frontend';
-import { CreateMeetupSchema } from './schemas/create-meetup.schema';
 import { CreateMeetupDto } from './dto/create-meetup.dto';
-import { UpdateMeetupSchema } from './schemas/update-meetup.schema';
 import { UpdateMeetupDto } from './dto/update-meetup.dto';
+import { IReadAllMeetupOptions } from './types/read-all-meetup.options';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { ReadAllResult } from '@app/common';
+import { METADATA } from '../constants/constants';
 
-@Controller('meetup')
+@Controller()
 export class MeetupController {
   constructor(private readonly meetupService: MeetupService) {}
 
-  @Get()
-  @HttpCode(HttpStatus.OK)
-  async readAll(): Promise<MeetupFrontend[]> {
-    const meetups = await this.meetupService.readAll();
-    return meetups.map((meetup) => new MeetupFrontend(meetup));
+  @MessagePattern(METADATA.MP_GET_ALL_MEETUPS)
+  async readAll(@Payload() readAllMeetupOptions: IReadAllMeetupOptions): Promise<ReadAllResult<MeetupFrontend>> {
+    const meetups = await this.meetupService.readAll(readAllMeetupOptions);
+    return {
+      totalRecordsNumber: meetups.totalRecordsNumber,
+      records: meetups.records.map((meetup) => new MeetupFrontend(meetup)),
+    };
   }
 
-  @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  async readById(@Param('id') id: string): Promise<MeetupFrontend> {
+  @MessagePattern(METADATA.MP_GET_MEETUP_BY_ID)
+  async readById(@Payload('id') id: string): Promise<MeetupFrontend> {
     const meetup = await this.meetupService.readById(id);
     return new MeetupFrontend(meetup);
   }
 
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Body(new JoiValidationPipe(CreateMeetupSchema)) createMeetupDto: CreateMeetupDto,
-  ): Promise<MeetupFrontend> {
+  @MessagePattern(METADATA.MP_CREATE_MEETUP)
+  async create(@Payload() createMeetupDto: CreateMeetupDto): Promise<MeetupFrontend> {
     const createdMeetup = await this.meetupService.create(createMeetupDto);
     return new MeetupFrontend(createdMeetup);
   }
 
-  @Put(':id')
-  @HttpCode(HttpStatus.OK)
+  @MessagePattern(METADATA.MP_UPDATE_MEETUP_BY_ID)
   async update(
-    @Param('id') id: string,
-    @Body(new JoiValidationPipe(UpdateMeetupSchema)) updateMeetupDto: UpdateMeetupDto,
+    @Payload('id') id: string,
+    @Payload('updateMeetupDto') updateMeetupDto: UpdateMeetupDto,
   ): Promise<MeetupFrontend> {
     const updatedMeetup = await this.meetupService.update(id, updateMeetupDto);
     return new MeetupFrontend(updatedMeetup);
   }
 
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id') id: string): Promise<void> {
+  @EventPattern(METADATA.EP_DELETE_MEETUP_BY_ID)
+  async deleteById(@Payload('id') id: string): Promise<void> {
     await this.meetupService.deleteById(id);
   }
 }
