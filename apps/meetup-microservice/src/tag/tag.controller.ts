@@ -6,12 +6,13 @@ import { TagFrontend } from './types/tag.frontend';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { ReadAllResult } from '@app/common';
 import { IReadAllTagOptions } from './types/read-all-tag.options';
+import { METADATA } from '../constants/constants';
 
 @Controller()
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
-  @MessagePattern('GET_ALL_TAGS')
+  @MessagePattern(METADATA.MP_GET_ALL_TAGS)
   async readAll(@Payload() readAllTagOptions: IReadAllTagOptions): Promise<ReadAllResult<TagFrontend>> {
     const tags = await this.tagService.readAll(readAllTagOptions);
     return {
@@ -20,25 +21,25 @@ export class TagController {
     };
   }
 
-  @MessagePattern('GET_TAG_BY_ID')
+  @MessagePattern(METADATA.MP_GET_TAG_BY_ID)
   async readById(@Payload('id') id: string): Promise<TagFrontend> {
     const tag = await this.tagService.readById(id);
     return new TagFrontend(tag);
   }
 
-  @MessagePattern('CREATE_TAG')
+  @MessagePattern(METADATA.MP_CREATE_TAG)
   async create(@Payload() createTagDto: CreateTagDto): Promise<TagFrontend> {
     const createdTag = await this.tagService.create(createTagDto);
     return new TagFrontend(createdTag);
   }
 
-  @MessagePattern('UPDATE_TAG_BY_ID')
+  @MessagePattern(METADATA.MP_UPDATE_TAG_BY_ID)
   async update(@Payload('id') id: string, @Payload('updateTagDto') updateTagDto: UpdateTagDto): Promise<TagFrontend> {
     const updatedTag = await this.tagService.update(id, updateTagDto);
     return new TagFrontend(updatedTag);
   }
 
-  @EventPattern('DELETE_TAG_BY_ID')
+  @EventPattern(METADATA.EP_DELETE_TAG_BY_ID)
   async deleteById(@Payload('id') id: string): Promise<void> {
     await this.tagService.deleteById(id);
   }
