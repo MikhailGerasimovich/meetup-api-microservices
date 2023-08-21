@@ -19,7 +19,7 @@ export class TagRepository {
     const column = readAllOptions?.sorting?.column ?? defaultSorting.column;
     const direction = readAllOptions?.sorting?.direction ?? defaultSorting.direction;
 
-    const filters = getTagFilters(readAllOptions.filters);
+    const filters = getTagFilters(readAllOptions?.filters);
 
     const records = await this.prisma.tags.findMany({
       where: { ...filters.tagFilters },
