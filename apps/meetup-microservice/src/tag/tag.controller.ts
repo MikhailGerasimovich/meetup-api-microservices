@@ -3,7 +3,6 @@ import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { TagFrontend } from './types/tag.frontend';
-import { ReadAllTagDto } from './dto/read-all-tag.dto';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { ReadAllResult } from '@app/common';
 import { IReadAllTagOptions } from './types/read-all-tag.options';
@@ -33,7 +32,7 @@ export class TagController {
     return new TagFrontend(createdTag);
   }
 
-  @MessagePattern('UPDATE_TAG')
+  @MessagePattern('UPDATE_TAG_BY_ID')
   async update(@Payload('id') id: string, @Payload('updateTagDto') updateTagDto: UpdateTagDto): Promise<TagFrontend> {
     const updatedTag = await this.tagService.update(id, updateTagDto);
     return new TagFrontend(updatedTag);

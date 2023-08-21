@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ReadAllTagDto } from './dto/read-all-tag.dto';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { TagFrontend } from './types/tag.frontend';
@@ -28,7 +27,7 @@ export class GatewayTagService {
   }
 
   async update(id: string, updateTagDto: UpdateTagDto): Promise<TagFrontend> {
-    const updatedTag = await firstValueFrom(this.client.send('UPDATE_TAG', { id, updateTagDto }));
+    const updatedTag = await firstValueFrom(this.client.send('UPDATE_TAG_BY_ID', { id, updateTagDto }));
     return updatedTag;
   }
 
