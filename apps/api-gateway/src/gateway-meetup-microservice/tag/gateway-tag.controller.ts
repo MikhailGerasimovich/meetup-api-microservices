@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  Delete,
+  NotFoundException,
+} from '@nestjs/common';
 import { GatewayTagService } from './gateway-tag.service';
 import { JoiValidationPipe, ReadAllResult } from '@app/common';
 import { ReadAllTagSchema } from './schemas/read-all-tag.schema';
