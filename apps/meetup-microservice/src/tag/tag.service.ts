@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { TagRepository } from './tag.repository';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
@@ -23,8 +23,8 @@ export class TagService {
     return tag;
   }
 
-  async getByTitle(title: string): Promise<Tag> {
-    const tag = await this.tagRepository.getByTitle(title);
+  async readByTitle(title: string): Promise<Tag> {
+    const tag = await this.tagRepository.readByTitle(title);
     return tag;
   }
 

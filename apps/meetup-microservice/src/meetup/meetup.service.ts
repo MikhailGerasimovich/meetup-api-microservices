@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { MeetupRepository } from './meetup.repository';
 import { Meetup } from './types/meetup.entity';
 import { CreateMeetupDto } from './dto/create-meetup.dto';
@@ -9,6 +9,7 @@ import { UpdateMeetupDto } from './dto/update-meetup.dto';
 import { MeetupUpdateAttrs } from './types/meetup.update.attrs';
 import { IReadAllMeetupOptions } from './types/read-all-meetup.options';
 import { ReadAllResult } from '@app/common';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class MeetupService {
@@ -45,7 +46,7 @@ export class MeetupService {
   async update(id: string, updateMeetupDto: UpdateMeetupDto): Promise<Meetup> {
     const existingMeetup = await this.meetupRepository.readById(id);
     if (!existingMeetup) {
-      throw new BadRequestException(`The specified meetup does not exist`);
+      throw new RpcException({ message: `The specified meetup does not exist`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
     const tags = updateMeetupDto.tags ? await this._createTagsIfNotExist(updateMeetupDto.tags) : null;
@@ -66,7 +67,7 @@ export class MeetupService {
   async deleteById(id: string): Promise<void> {
     const existingMeetup = await this.meetupRepository.readById(id);
     if (!existingMeetup) {
-      throw new BadRequestException(`The specified meetup does not exist`);
+      throw new RpcException({ message: `The specified meetup does not exist`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
     await this.meetupRepository.deleteById(id);
@@ -75,7 +76,7 @@ export class MeetupService {
   private async _createTagsIfNotExist(tagsTitle: string[]): Promise<Tag[]> {
     const tags = [];
     for await (let title of tagsTitle) {
-      const existingTag = await this.tagService.getByTitle(title);
+      const existingTag = await this.tagService.readByTitle(title);
       if (!existingTag) {
         tags.push(await this.tagService.create({ title: title }));
         continue;
