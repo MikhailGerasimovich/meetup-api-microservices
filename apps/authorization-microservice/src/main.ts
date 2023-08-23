@@ -1,8 +1,10 @@
 import { NestFactory } from '@nestjs/core';
+import * as coocieParser from 'cookie-parser';
 import { AuthorizationMicroserviceModule } from './authorization-microservice.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthorizationMicroserviceModule);
+  app.use(coocieParser());
   await app.listen(3000);
 }
 bootstrap();
