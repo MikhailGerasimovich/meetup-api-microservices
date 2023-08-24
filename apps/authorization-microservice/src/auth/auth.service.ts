@@ -1,11 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/types/user.entity';
 import { compareSync, hash } from 'bcryptjs';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { JwtFrontend } from './types/jwt.type';
+import { JwtFrontend } from './types/jwt.frontend';
 import { PayloadDto } from './dto/payload.dto';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,7 @@ export class AuthService {
       return candidate;
     }
 
-    throw new BadRequestException('wrong login or password');
+    throw new RpcException({ message: 'wrong login or password', statusCode: HttpStatus.BAD_REQUEST });
   }
 
   public async registration(createUserDto: CreateUserDto): Promise<User> {

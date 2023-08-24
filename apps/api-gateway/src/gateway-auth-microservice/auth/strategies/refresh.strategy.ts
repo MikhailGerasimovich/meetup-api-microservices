@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PayloadDto } from '../dto/payload.dto';
-import { UserService } from '../../user/user.service';
+import { PayloadDto } from '../../../../../authorization-microservice/src/auth/dto/payload.dto';
+import { UserService } from '../../../../../authorization-microservice/src/user/user.service';
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
@@ -18,7 +18,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
         },
       ]),
       ignoreExpiration: true,
-      secretOrKey: process.env.JWT_REFRESH_SECRET,
+      secretOrKey: 'refresh',
     });
   }
 

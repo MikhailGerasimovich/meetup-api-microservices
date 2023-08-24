@@ -1,35 +1,31 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
+import { Controller } from '@nestjs/common';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserFrontend } from '../user/types/user.frontend';
 import { AuthService } from './auth.service';
-import { CreateUserSchema } from '../user/schemas/create-user.schema';
-import { JoiValidationPipe, UserFromRequest } from '@app/common';
-import { LocalAuthGuard } from '@app/common/guards/local.guard';
 import { User } from '../user/types/user.entity';
-import { JwtFrontend } from './types/jwt.type';
+import { JwtFrontend } from './types/jwt.frontend';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { METADATA } from '../constants/constants';
 
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('registration')
-  @HttpCode(HttpStatus.CREATED)
-  public async registration(
-    @Body(new JoiValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto,
-  ): Promise<UserFrontend> {
+  @MessagePattern(METADATA.MP_REGISTRATION)
+  public async registration(@Payload() createUserDto: CreateUserDto): Promise<UserFrontend> {
     const registeredUser = await this.authService.registration(createUserDto);
     return new UserFrontend(registeredUser);
   }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  public async login(@UserFromRequest() user: User, @Req() req: Request): Promise<JwtFrontend> {
-    console.log(user);
-
+  @MessagePattern(METADATA.MP_LOGIN)
+  public async login(@Payload() user: User): Promise<JwtFrontend> {
     const tokens = await this.authService.login(user);
-    req.res.cookie('auth-cookie', tokens, { httpOnly: true });
-    return tokens;
+    return new JwtFrontend(tokens.accessToken, tokens.refreshToken);
+  }
+
+  @MessagePattern(METADATA.MP_VALIDATE_USER)
+  public async validateUser(@Payload('login') login: string, @Payload('password') password: string) {
+    const validate = await this.authService.validateUser(login, password);
+    return validate;
   }
 }

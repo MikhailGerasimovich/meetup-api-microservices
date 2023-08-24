@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { AuthService } from '../auth.service';
+import { GatewayAuthService } from '../gateway-auth.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
+  constructor(private gatewayAuthService: GatewayAuthService) {
     super({
       usernameField: 'login',
       passwordField: 'password',
@@ -13,7 +13,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(login: string, password: string) {
-    const user = await this.authService.validateUser(login, password);
+    const user = await this.gatewayAuthService.validateUser(login, password);
     return user;
   }
 }
