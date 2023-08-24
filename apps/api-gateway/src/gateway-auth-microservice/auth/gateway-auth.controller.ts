@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import { GatewayAuthService } from './gateway-auth.service';
 import { JoiValidationPipe, LocalAuthGuard, UserFromRequest } from '@app/common';
-import { CreateUserSchema } from './schemas/create-user.schema';
+import { RegistrationUserSchema } from './schemas/regiastration-user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserFrontend } from './types/user.frontend';
 import { User } from './types/user.entity';
@@ -15,7 +15,7 @@ export class GatewayAuthController {
   @Post('registration')
   @HttpCode(HttpStatus.CREATED)
   public async registration(
-    @Body(new JoiValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto,
+    @Body(new JoiValidationPipe(RegistrationUserSchema)) createUserDto: CreateUserDto,
   ): Promise<UserFrontend> {
     console.log(createUserDto);
 

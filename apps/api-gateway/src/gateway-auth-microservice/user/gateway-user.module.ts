@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { GatewayAuthService } from './gateway-auth.service';
-import { GatewayAuthController } from './gateway-auth.controller';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { LocalStrategy } from './strategies/local.strategy';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { JwtStrategy } from '../auth/strategies/jwt.strategy';
+import { GatewayUserService } from './gateway-user.service';
+import { GatewayUserController } from './gateway-user.controller';
 import { AUTH_MICROSERVICE } from '../../constants/constants';
 
 @Module({
@@ -29,8 +28,8 @@ import { AUTH_MICROSERVICE } from '../../constants/constants';
       signOptions: { expiresIn: '12h' },
     }),
   ],
-  providers: [GatewayAuthService, LocalStrategy, JwtStrategy],
-  controllers: [GatewayAuthController],
-  exports: [GatewayAuthService],
+  providers: [JwtStrategy, GatewayUserService],
+  controllers: [GatewayUserController],
+  exports: [],
 })
-export class GatewayAuthModule {}
+export class GatewayUserModule {}

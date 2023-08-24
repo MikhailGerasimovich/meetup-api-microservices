@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { GatewayTagController } from './gateway-tag.controller';
 import { GatewayTagService } from './gateway-tag.service';
-import { MEETUP_MICROSERVICE } from '../../constants/gateway-meetup.constants';
+import { MEETUP_MICROSERVICE } from '../../constants/constants';
 
 @Module({
   imports: [
