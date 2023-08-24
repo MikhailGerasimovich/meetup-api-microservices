@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserFrontend } from './types/user.frontend';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
-import { METADATA } from '../constants/constants';
+import { AUTH_METADATA } from '../constants/constants';
 import { IReadAllUserOptions } from './types/read-all-user.options';
 import { ReadAllResult } from '@app/common';
 
@@ -10,7 +10,7 @@ import { ReadAllResult } from '@app/common';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @MessagePattern(METADATA.MP_GET_ALL_USERS)
+  @MessagePattern(AUTH_METADATA.MP_GET_ALL_USERS)
   async readAll(@Payload() readAllUserOptions: IReadAllUserOptions): Promise<ReadAllResult<UserFrontend>> {
     const users = await this.userService.readAll(readAllUserOptions);
     return {
@@ -19,13 +19,13 @@ export class UserController {
     };
   }
 
-  @MessagePattern(METADATA.MP_GET_USER_BY_ID)
+  @MessagePattern(AUTH_METADATA.MP_GET_USER_BY_ID)
   async readById(@Payload('id') id: string): Promise<UserFrontend> {
     const user = await this.userService.readById(id);
     return new UserFrontend(user);
   }
 
-  @EventPattern(METADATA.EP_DELETE_USER_BY_ID)
+  @EventPattern(AUTH_METADATA.EP_DELETE_USER_BY_ID)
   async deleteById(@Payload('id') id: string): Promise<void> {
     await this.userService.deleteById(id);
   }

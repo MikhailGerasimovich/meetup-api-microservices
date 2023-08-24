@@ -3,7 +3,7 @@ export const AUTH_MICROSERVICE = {
   RMQ_QUEUE: process.env.RMQ_QUEUE_AUTH_MICROSERVICE || 'auth_microservice_queue',
 };
 
-export const METADATA = {
+export const AUTH_METADATA = {
   MP_REGISTRATION: 'REGISTRATION',
   MP_LOGIN: 'LOGIN',
   MP_VALIDATE_USER: 'VALIDATE_USER',
@@ -11,4 +11,9 @@ export const METADATA = {
   MP_GET_ALL_USERS: 'GET_ALL_USERS',
   MP_GET_USER_BY_ID: 'GET_USER_BY_ID',
   EP_DELETE_USER_BY_ID: 'DELETE_USER_BY_ID',
+};
+
+export const ROLES_NAME = {
+  USER: 'USER',
+  ADMIN: 'ADMIN',
 };
