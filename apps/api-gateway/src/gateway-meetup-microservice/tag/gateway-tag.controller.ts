@@ -49,7 +49,7 @@ export class GatewayTagController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id') id: string): Promise<any> {
+  async deleteById(@Param('id') id: string): Promise<void> {
     await this.gatewayTagService.deleteById(id);
   }
 }

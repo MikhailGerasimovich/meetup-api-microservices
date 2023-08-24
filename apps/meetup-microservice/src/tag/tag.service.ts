@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { TagRepository } from './tag.repository';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
@@ -7,6 +7,7 @@ import { TagCreationAttrs } from './types/tag.creation-attrs';
 import { TagUpdateAttrs } from './types/tag.update-attrs';
 import { IReadAllTagOptions } from './types/read-all-tag.options';
 import { ReadAllResult } from '@app/common';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class TagService {
@@ -22,8 +23,8 @@ export class TagService {
     return tag;
   }
 
-  async getByTitle(title: string): Promise<Tag> {
-    const tag = await this.tagRepository.getByTitle(title);
+  async readByTitle(title: string): Promise<Tag> {
+    const tag = await this.tagRepository.readByTitle(title);
     return tag;
   }
 
@@ -38,7 +39,7 @@ export class TagService {
   async update(id: string, updateTagDto: UpdateTagDto): Promise<Tag> {
     const existingTag = await this.tagRepository.readById(id);
     if (!existingTag) {
-      throw new BadRequestException(`The specified tag does not exist`);
+      throw new RpcException({ message: `The specified tag does not exist`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
     const tagUpdateAttrs: TagUpdateAttrs = {
@@ -52,7 +53,7 @@ export class TagService {
   async deleteById(id: string): Promise<void> {
     const existingTag = await this.tagRepository.readById(id);
     if (!existingTag) {
-      throw new BadRequestException(`The specified tag does not exist`);
+      throw new RpcException({ message: `The specified tag does not exist`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
     await this.tagRepository.deleteById(id);

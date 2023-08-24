@@ -2,14 +2,24 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  catch(exception: Error, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 
-    const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    console.log(exception);
 
-    console.log(exception.stack);
+    if (exception instanceof HttpException) {
+      const status = exception.getStatus();
+      response.status(status).json(exception);
+      return;
+    }
 
-    response.status(status).json(exception);
+    const customRpcException = exception as { message: string; statusCode: number };
+    if (customRpcException?.statusCode) {
+      response.status(customRpcException.statusCode).json(customRpcException);
+      return;
+    }
+
+    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(exception);
   }
 }

@@ -42,7 +42,7 @@ export class TagRepository {
     return tag;
   }
 
-  async getByTitle(title: string) {
+  async readByTitle(title: string) {
     const tag = await this.prisma.tags.findUnique({
       where: { title },
     });

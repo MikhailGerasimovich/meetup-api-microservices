@@ -2,16 +2,17 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { GatewayMeetupService } from './gateway-meetup.service';
 import { GatewayMeetupController } from './gateway-meetup.controller';
+import { MEETUP_MICROSERVICE } from '../../constants/constants';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: 'GATEWAY_MEETUP_SERVICE',
+        name: MEETUP_MICROSERVICE.RMQ_CLIENT_NAME,
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'meetup_microservice_queue',
+          urls: [MEETUP_MICROSERVICE.RMQ_URL],
+          queue: MEETUP_MICROSERVICE.RMQ_QUEUE,
           queueOptions: {
             durable: false,
           },

@@ -84,6 +84,47 @@ export class MeetupRepository {
     return createdMeetup;
   }
 
+  async joinToMeetup(meetupId: string, memberId: string): Promise<Meetup> {
+    const meetup = await this.prisma.meetups.update({
+      where: { id: Number(meetupId) },
+      data: {
+        members: {
+          create: {
+            userId: Number(memberId),
+          },
+        },
+      },
+    });
+
+    return meetup;
+  }
+
+  async leaveFromMeetup(meetupId: string, memberId: string): Promise<Meetup> {
+    const meetup = await this.prisma.meetups.update({
+      where: { id: Number(meetupId) },
+      data: {
+        members: {
+          deleteMany: {
+            userId: Number(memberId),
+          },
+        },
+      },
+    });
+
+    return meetup;
+  }
+
+  async isJoined(meetupId: string, memberId: string): Promise<boolean> {
+    const meetups = await this.prisma.members.findMany({
+      where: {
+        meetupId: Number(meetupId),
+        userId: Number(memberId),
+      },
+    });
+
+    return meetups.length !== 0;
+  }
+
   async update(id: string, meetupUpdateAttrs: MeetupUpdateAttrs): Promise<Meetup> {
     const data: any = {
       title: meetupUpdateAttrs.title,

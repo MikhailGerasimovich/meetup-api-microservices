@@ -1,10 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./../../node_modules/@prisma-meetup/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:957483@localhost:5432/meetup_microservice_db?schema=public"
 }
 
 model Meetups {
