@@ -7,6 +7,7 @@ import { IReadAllMeetupOptions } from './types/read-all-meetup.options';
 import { CreateMeetupDto } from './dto/create-meetup.dto';
 import { UpdateMeetupDto } from './dto/update-meetup.dto';
 import { MEETUP_METADATA, MEETUP_MICROSERVICE } from '../../constants/constants';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class GatewayMeetupService {
@@ -22,9 +23,21 @@ export class GatewayMeetupService {
     return meetup;
   }
 
-  async create(createMeetupDto: CreateMeetupDto): Promise<MeetupFrontend> {
-    const createdMeetup = await firstValueFrom(this.client.send(MEETUP_METADATA.MP_CREATE_MEETUP, createMeetupDto));
+  async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto): Promise<MeetupFrontend> {
+    const createdMeetup = await firstValueFrom(
+      this.client.send(MEETUP_METADATA.MP_CREATE_MEETUP, { createMeetupDto, organizer }),
+    );
     return createdMeetup;
+  }
+
+  async joinToMeetup(meetupId: string, member: JwtPayloadDto): Promise<MeetupFrontend> {
+    const meetup = await firstValueFrom(this.client.send(MEETUP_METADATA.MP_JOIN_TO_MEETUP, { meetupId, member }));
+    return meetup;
+  }
+
+  async leaveFromMeetup(meetupId: string, member: JwtPayloadDto): Promise<MeetupFrontend> {
+    const meetup = await firstValueFrom(this.client.send(MEETUP_METADATA.MP_LEAVE_FROM_MEETUP, { meetupId, member }));
+    return meetup;
   }
 
   async update(id: string, updateTagDto: UpdateMeetupDto): Promise<MeetupFrontend> {

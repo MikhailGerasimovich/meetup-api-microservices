@@ -10,6 +10,7 @@ import { MeetupUpdateAttrs } from './types/meetup.update.attrs';
 import { IReadAllMeetupOptions } from './types/read-all-meetup.options';
 import { ReadAllResult } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class MeetupService {
@@ -28,7 +29,7 @@ export class MeetupService {
     return meetup;
   }
 
-  async create(createMeetupDto: CreateMeetupDto): Promise<Meetup> {
+  async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto): Promise<Meetup> {
     const tags = await this._createTagsIfNotExist(createMeetupDto.tags);
 
     const meetupCreationAttrs: MeetupCreationAttrs = {
@@ -37,10 +38,37 @@ export class MeetupService {
       date: createMeetupDto.date,
       place: createMeetupDto.place,
       tags: tags,
-      organizerId: 1, //test data
+      organizerId: organizer.id,
     };
     const createdMeetup = await this.meetupRepository.create(meetupCreationAttrs);
     return createdMeetup;
+  }
+
+  async joinToMeetup(meetupId: string, member: JwtPayloadDto): Promise<Meetup> {
+    const memberId = String(member.id);
+
+    const isJoined = await this.meetupRepository.isJoined(meetupId, memberId);
+    if (isJoined) {
+      throw new RpcException({ message: `You are already joined for this meetup`, statusCode: HttpStatus.BAD_REQUEST });
+    }
+
+    const meetup = await this.meetupRepository.joinToMeetup(meetupId, memberId);
+    return meetup;
+  }
+
+  async leaveFromMeetup(meetupId: string, member: JwtPayloadDto): Promise<Meetup> {
+    const memberId = String(member.id);
+
+    const isJoined = await this.meetupRepository.isJoined(meetupId, memberId);
+    if (!isJoined) {
+      throw new RpcException({
+        message: `You can't leave a meeting you're not in`,
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
+
+    const meetup = await this.meetupRepository.leaveFromMeetup(meetupId, memberId);
+    return meetup;
   }
 
   async update(id: string, updateMeetupDto: UpdateMeetupDto): Promise<Meetup> {

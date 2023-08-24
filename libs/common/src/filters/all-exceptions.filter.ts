@@ -11,6 +11,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       response.status(status).json(exception);
+      return;
     }
 
     const customRpcException = exception as { message: string; statusCode: number };

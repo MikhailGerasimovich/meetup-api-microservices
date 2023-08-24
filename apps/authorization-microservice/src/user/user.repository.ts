@@ -53,7 +53,10 @@ export class UserRepository {
     return user;
   }
 
-  async readByLogin(login: string): Promise<User> {
+  async readByLogin(login: string, requiredFields?: string[]): Promise<User> {
+    const toSelect = {};
+    requiredFields?.forEach((field) => (toSelect[field] = true));
+
     const user = await this.prisma.users.findUnique({
       where: { login },
 
@@ -61,7 +64,7 @@ export class UserRepository {
         id: true,
         login: true,
         email: true,
-        password: true,
+        ...toSelect,
       },
     });
     return user;
@@ -83,23 +86,6 @@ export class UserRepository {
       },
     });
     return createdUser;
-  }
-
-  async update(id: string, userUpdateAttrs: UserUpdateAttrs): Promise<User> {
-    const updatedUser = await this.prisma.users.update({
-      where: { id: Number(id) },
-      data: {
-        login: userUpdateAttrs.login,
-        email: userUpdateAttrs.email,
-      },
-
-      select: {
-        id: true,
-        login: true,
-        email: true,
-      },
-    });
-    return updatedUser;
   }
 
   async deleteById(id: string): Promise<void> {

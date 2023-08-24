@@ -27,6 +27,10 @@ export class GatewayAuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   public async login(@UserFromRequest() user: User, @Req() req: Request): Promise<JwtFrontend> {
+    console.log(user);
+
+    console.log(user);
+
     const tokens = await this.gatewayAuthService.login(user);
     req.res.cookie('auth-cookie', tokens, { httpOnly: true });
     return tokens;

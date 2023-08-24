@@ -24,8 +24,8 @@ export class UserService {
     return user;
   }
 
-  async readByLogin(login: string): Promise<User> {
-    const user = await this.userRepository.readByLogin(login);
+  async readByLogin(login: string, requiredFields?: string[]): Promise<User> {
+    const user = await this.userRepository.readByLogin(login, requiredFields);
     return user;
   }
 
@@ -38,21 +38,6 @@ export class UserService {
     };
     const createdUser = await this.userRepository.create(userCreationAttrs);
     return createdUser;
-  }
-
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const existingUser = await this.userRepository.readById(id);
-    if (!existingUser) {
-      throw new RpcException({ message: `The specified user does not exist`, statusCode: HttpStatus.BAD_REQUEST });
-    }
-
-    const userUpdateAttrs: UserUpdateAttrs = {
-      login: updateUserDto.login || existingUser.login,
-      email: updateUserDto.email || existingUser.email,
-    };
-
-    const updatedUser = await this.userRepository.update(id, userUpdateAttrs);
-    return updatedUser;
   }
 
   async deleteById(id: string): Promise<void> {

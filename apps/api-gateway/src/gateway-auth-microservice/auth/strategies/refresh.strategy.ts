@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PayloadDto } from '../../../../../authorization-microservice/src/auth/dto/payload.dto';
-import { UserService } from '../../../../../authorization-microservice/src/user/user.service';
+import { JWT } from '../../../constants/constants';
+import { JwtPayloadDto } from '../dto/jwt-payload.dto';
+import { GatewayUserService } from '../../user/gateway-user.service';
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
-  constructor(private userService: UserService) {
+  constructor(private gatewayUserService: GatewayUserService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request) => {
@@ -18,15 +19,15 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
         },
       ]),
       ignoreExpiration: true,
-      secretOrKey: 'refresh',
+      secretOrKey: JWT.REFRESH_SECRET,
     });
   }
 
-  async validate(payload: PayloadDto) {
+  async validate(payload: JwtPayloadDto) {
     if (!payload) {
       throw new BadRequestException('missing refresh jwt');
     }
-    const user = await this.userService.readById(String(payload.id));
+    const user = await this.gatewayUserService.readById(String(payload.id));
     return user;
   }
 }

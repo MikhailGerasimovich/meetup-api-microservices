@@ -5,8 +5,9 @@ import { User } from '../user/types/user.entity';
 import { compareSync, hash } from 'bcryptjs';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { JwtFrontend } from './types/jwt.frontend';
-import { PayloadDto } from './dto/payload.dto';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import { RpcException } from '@nestjs/microservices';
+import { JWT } from '../constants/constants';
 
 @Injectable()
 export class AuthService {
@@ -15,10 +16,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async validateUser(login: string, password: string): Promise<User> {
-    const candidate = await this.userService.readByLogin(login);
+  public async validateUser(login: string, password: string): Promise<JwtPayloadDto> {
+    const candidate = await this.userService.readByLogin(login, ['password', 'roles']);
+
     if (candidate && compareSync(password, candidate.password)) {
-      return candidate;
+      return { id: candidate.id, roles: candidate.roles };
     }
 
     throw new RpcException({ message: 'wrong login or password', statusCode: HttpStatus.BAD_REQUEST });
@@ -42,19 +44,19 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private async generateAccessJwt(payload: PayloadDto): Promise<string> {
+  private async generateAccessJwt(payload: JwtPayloadDto): Promise<string> {
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: 'secret',
-      expiresIn: '12h',
+      secret: JWT.ACCESS_SECRET,
+      expiresIn: JWT.ACCESS_DURATION,
     });
 
     return accessToken;
   }
 
-  private async generateRefreshJwt(payload: PayloadDto): Promise<string> {
+  private async generateRefreshJwt(payload: JwtPayloadDto): Promise<string> {
     const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: 'secret',
-      expiresIn: '12h',
+      secret: JWT.REFRESH_SECRET,
+      expiresIn: JWT.REFRESH_DURATION,
     });
 
     return refreshToken;

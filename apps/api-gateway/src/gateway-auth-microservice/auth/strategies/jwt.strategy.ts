@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common/decorators';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UnauthorizedException } from '@nestjs/common';
-import { PayloadDto } from '../../../../../authorization-microservice/src/auth/dto/payload.dto';
+import { JwtPayloadDto } from 'apps/authorization-microservice/src/auth/dto/jwt-payload.dto';
+import { JWT } from '../../../constants/constants';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,11 +19,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: 'secret',
+      secretOrKey: JWT.ACCESS_SECRET,
     });
   }
 
-  public async validate(payload: PayloadDto) {
+  public async validate(payload: JwtPayloadDto) {
     if (!payload) {
       throw new UnauthorizedException('missing access jwt');
     }

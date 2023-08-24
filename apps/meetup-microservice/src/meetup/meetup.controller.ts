@@ -7,6 +7,7 @@ import { IReadAllMeetupOptions } from './types/read-all-meetup.options';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { ReadAllResult } from '@app/common';
 import { METADATA } from '../constants/constants';
+import { JwtPayloadDto } from 'apps/authorization-microservice/src/auth/dto/jwt-payload.dto';
 
 @Controller()
 export class MeetupController {
@@ -28,9 +29,30 @@ export class MeetupController {
   }
 
   @MessagePattern(METADATA.MP_CREATE_MEETUP)
-  async create(@Payload() createMeetupDto: CreateMeetupDto): Promise<MeetupFrontend> {
-    const createdMeetup = await this.meetupService.create(createMeetupDto);
+  async create(
+    @Payload('createMeetupDto') createMeetupDto: CreateMeetupDto,
+    @Payload('organizer') organizer: JwtPayloadDto,
+  ): Promise<MeetupFrontend> {
+    const createdMeetup = await this.meetupService.create(createMeetupDto, organizer);
     return new MeetupFrontend(createdMeetup);
+  }
+
+  @MessagePattern(METADATA.MP_JOIN_TO_MEETUP)
+  async joinToMeetup(
+    @Payload('meetupId') meetupId: string,
+    @Payload('member') member: JwtPayloadDto,
+  ): Promise<MeetupFrontend> {
+    const meetup = await this.meetupService.joinToMeetup(meetupId, member);
+    return new MeetupFrontend(meetup);
+  }
+
+  @MessagePattern(METADATA.MP_LEAVE_FROM_MEETUP)
+  async leaveFromMeetup(
+    @Payload('meetupId') meetupId: string,
+    @Payload('member') member: JwtPayloadDto,
+  ): Promise<MeetupFrontend> {
+    const meetup = await this.meetupService.leaveFromMeetup(meetupId, member);
+    return new MeetupFrontend(meetup);
   }
 
   @MessagePattern(METADATA.MP_UPDATE_MEETUP_BY_ID)

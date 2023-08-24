@@ -17,3 +17,10 @@ export const ROLES_NAME = {
   USER: 'USER',
   ADMIN: 'ADMIN',
 };
+
+export const JWT = {
+  ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'JWT_ACCESS_SECRET',
+  REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'JWT_REFRESH_SECRET',
+  ACCESS_DURATION: process.env.JWT_ACCESS_DURATION || '1h',
+  REFRESH_DURATION: process.env.JWT_REFRESH_DURATION || '24h',
+};
