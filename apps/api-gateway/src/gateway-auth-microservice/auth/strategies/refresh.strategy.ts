@@ -3,14 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JWT } from '../../../constants/constants';
 import { JwtPayloadDto } from '../dto/jwt-payload.dto';
-import { GatewayUserService } from '../../user/gateway-user.service';
+import { Request } from 'express';
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
-  constructor(private gatewayUserService: GatewayUserService) {
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request) => {
+        (request: Request) => {
           const data = request?.cookies['auth-cookie'];
           if (!data) {
             return null;
@@ -27,7 +27,6 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
     if (!payload) {
       throw new BadRequestException('missing refresh jwt');
     }
-    const user = await this.gatewayUserService.readById(String(payload.id));
-    return user;
+    return payload;
   }
 }

@@ -3,9 +3,10 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserFrontend } from '../user/types/user.frontend';
 import { AuthService } from './auth.service';
 import { User } from '../user/types/user.entity';
-import { JwtFrontend } from './types/jwt.frontend';
+import { JwtType } from './types/jwt.type';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AUTH_METADATA } from '../constants/constants';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Controller()
 export class AuthController {
@@ -17,10 +18,19 @@ export class AuthController {
     return new UserFrontend(registeredUser);
   }
 
+  @MessagePattern(AUTH_METADATA.MP_REFRESH)
+  public async refresh(
+    @Payload('userPayload') userPayload: JwtPayloadDto,
+    @Payload('refreshToken') refreshToken: string,
+  ): Promise<JwtType> {
+    const tokens = await this.authService.refresh(userPayload, refreshToken);
+    return new JwtType(tokens.accessToken, tokens.refreshToken);
+  }
+
   @MessagePattern(AUTH_METADATA.MP_LOGIN)
-  public async login(@Payload() user: User): Promise<JwtFrontend> {
+  public async login(@Payload() user: User): Promise<JwtType> {
     const tokens = await this.authService.login(user);
-    return new JwtFrontend(tokens.accessToken, tokens.refreshToken);
+    return new JwtType(tokens.accessToken, tokens.refreshToken);
   }
 
   @MessagePattern(AUTH_METADATA.MP_VALIDATE_USER)

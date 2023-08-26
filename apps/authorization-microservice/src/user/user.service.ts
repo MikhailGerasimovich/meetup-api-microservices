@@ -5,9 +5,7 @@ import { UserCreationAttrs } from './types/user.creation-attrs';
 import { IReadAllUserOptions } from './types/read-all-user.options';
 import { ReadAllResult } from '@app/common';
 import { User } from './types/user.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { RpcException } from '@nestjs/microservices';
-import { UserUpdateAttrs } from './types/user.update-attrs';
 import { ROLES_NAME } from '../constants/constants';
 
 @Injectable()
