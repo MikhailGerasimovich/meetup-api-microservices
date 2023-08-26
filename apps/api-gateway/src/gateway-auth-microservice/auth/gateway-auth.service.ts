@@ -11,7 +11,7 @@ import { JwtPayloadDto } from './dto/jwt-payload.dto';
 export class GatewayAuthService {
   constructor(@Inject(AUTH_MICROSERVICE.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}
 
-  public async registration(createUserDto: CreateUserDto): Promise<User> {
+  public async registration(createUserDto: CreateUserDto): Promise<JwtType> {
     const user = await firstValueFrom(this.client.send(AUTH_METADATA.MP_REGISTRATION, createUserDto));
     return user;
   }

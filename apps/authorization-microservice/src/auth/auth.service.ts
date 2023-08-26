@@ -25,13 +25,19 @@ export class AuthService {
     throw new RpcException({ message: 'wrong login or password', statusCode: HttpStatus.BAD_REQUEST });
   }
 
-  public async registration(createUserDto: CreateUserDto): Promise<User> {
+  public async registration(createUserDto: CreateUserDto): Promise<JwtType> {
     const hashPassword = await hash(createUserDto.password, 10);
     const registratedUser = await this.userService.create({
       ...createUserDto,
       password: hashPassword,
     });
-    return registratedUser;
+
+    const payload = { id: registratedUser.id, roles: registratedUser.roles };
+
+    const accessToken = await this.jwtService.generateAccessJwt(payload);
+    const refreshToken = await this.jwtService.generateRefreshJwt(payload);
+
+    return { accessToken, refreshToken };
   }
 
   public async login(user: User): Promise<JwtType> {

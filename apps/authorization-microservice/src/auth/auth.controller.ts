@@ -13,9 +13,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @MessagePattern(AUTH_METADATA.MP_REGISTRATION)
-  public async registration(@Payload() createUserDto: CreateUserDto): Promise<UserFrontend> {
-    const registeredUser = await this.authService.registration(createUserDto);
-    return new UserFrontend(registeredUser);
+  public async registration(@Payload() createUserDto: CreateUserDto): Promise<JwtType> {
+    const tokens = await this.authService.registration(createUserDto);
+    return new JwtType(tokens.accessToken, tokens.refreshToken);
   }
 
   @MessagePattern(AUTH_METADATA.MP_REFRESH)

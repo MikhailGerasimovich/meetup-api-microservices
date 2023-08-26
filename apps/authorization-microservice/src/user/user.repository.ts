@@ -5,7 +5,6 @@ import { User } from './types/user.entity';
 import { IReadAllUserOptions } from './types/read-all-user.options';
 import { ReadAllResult, defaultPagination, defaultSorting, offset } from '@app/common';
 import { getUserFilters } from './filters/read-all-user.filter';
-import { UserUpdateAttrs } from './types/user.update-attrs';
 
 @Injectable()
 export class UserRepository {
@@ -83,6 +82,7 @@ export class UserRepository {
         id: true,
         login: true,
         email: true,
+        roles: true,
       },
     });
     return createdUser;

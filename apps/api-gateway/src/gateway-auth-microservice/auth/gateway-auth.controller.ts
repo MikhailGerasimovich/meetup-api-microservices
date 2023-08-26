@@ -3,7 +3,6 @@ import { GatewayAuthService } from './gateway-auth.service';
 import { JoiValidationPipe, LocalAuthGuard, UserFromRequest } from '@app/common';
 import { RegistrationUserSchema } from './schemas/regiastration-user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserFrontend } from './types/user.frontend';
 import { User } from './types/user.entity';
 import { Request, Response } from 'express';
 import { JwtType } from './types/jwt.type';
@@ -18,9 +17,11 @@ export class GatewayAuthController {
   @HttpCode(HttpStatus.CREATED)
   public async registration(
     @Body(new JoiValidationPipe(RegistrationUserSchema)) createUserDto: CreateUserDto,
-  ): Promise<UserFrontend> {
-    const registeredUser = await this.gatewayAuthService.registration(createUserDto);
-    return new UserFrontend(registeredUser);
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<JwtType> {
+    const tokens = await this.gatewayAuthService.registration(createUserDto);
+    res.cookie('auth-cookie', tokens, { httpOnly: true });
+    return tokens;
   }
 
   @UseGuards(LocalAuthGuard)
