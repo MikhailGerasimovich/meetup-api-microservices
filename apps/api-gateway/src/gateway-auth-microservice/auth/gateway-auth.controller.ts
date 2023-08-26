@@ -1,12 +1,14 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { GatewayAuthService } from './gateway-auth.service';
 import { JoiValidationPipe, LocalAuthGuard, UserFromRequest } from '@app/common';
 import { RegistrationUserSchema } from './schemas/regiastration-user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserFrontend } from './types/user.frontend';
 import { User } from './types/user.entity';
-import { Request } from 'express';
-import { JwtFrontend } from './types/jwt.frontend';
+import { Request, Response } from 'express';
+import { JwtType } from './types/jwt.type';
+import { RefreshGuard } from '@app/common/guards/refresh.guard';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Controller('auth')
 export class GatewayAuthController {
@@ -17,8 +19,6 @@ export class GatewayAuthController {
   public async registration(
     @Body(new JoiValidationPipe(RegistrationUserSchema)) createUserDto: CreateUserDto,
   ): Promise<UserFrontend> {
-    console.log(createUserDto);
-
     const registeredUser = await this.gatewayAuthService.registration(createUserDto);
     return new UserFrontend(registeredUser);
   }
@@ -26,13 +26,23 @@ export class GatewayAuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  public async login(@UserFromRequest() user: User, @Req() req: Request): Promise<JwtFrontend> {
-    console.log(user);
-
-    console.log(user);
-
+  public async login(@UserFromRequest() user: User, @Res({ passthrough: true }) res: Response): Promise<JwtType> {
     const tokens = await this.gatewayAuthService.login(user);
-    req.res.cookie('auth-cookie', tokens, { httpOnly: true });
+    res.cookie('auth-cookie', tokens, { httpOnly: true });
+    return tokens;
+  }
+
+  @UseGuards(RefreshGuard)
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  public async refresh(
+    @UserFromRequest() userPayload: JwtPayloadDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<JwtType> {
+    const { refreshToken } = req?.cookies['auth-cookie'];
+    const tokens = await this.gatewayAuthService.refresh(userPayload, refreshToken);
+    res.cookie('auth-cookie', tokens, { httpOnly: true });
     return tokens;
   }
 }

@@ -1,4 +1,4 @@
-export class JwtFrontend {
+export class JwtType {
   public accessToken: string;
   public refreshToken: string;
 

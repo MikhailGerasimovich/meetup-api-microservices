@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { User } from './types/user.entity';
-import { JwtFrontend } from './types/jwt.frontend';
+import { JwtType } from './types/jwt.type';
 import { CreateUserDto } from './dto/create-user.dto';
 import { firstValueFrom } from 'rxjs';
 import { AUTH_METADATA, AUTH_MICROSERVICE } from '../../constants/constants';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class GatewayAuthService {
@@ -15,8 +16,13 @@ export class GatewayAuthService {
     return user;
   }
 
-  public async login(user: User): Promise<JwtFrontend> {
+  public async login(user: User): Promise<JwtType> {
     const tokens = await firstValueFrom(this.client.send(AUTH_METADATA.MP_LOGIN, user));
+    return tokens;
+  }
+
+  public async refresh(userPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
+    const tokens = await firstValueFrom(this.client.send(AUTH_METADATA.MP_REFRESH, { userPayload, refreshToken }));
     return tokens;
   }
 

@@ -6,7 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_MICROSERVICE } from '../../constants/constants';
+import { AUTH_MICROSERVICE, JWT } from '../../constants/constants';
+import { RefreshStrategy } from './strategies/refresh.strategy';
 
 @Module({
   imports: [
@@ -25,11 +26,11 @@ import { AUTH_MICROSERVICE } from '../../constants/constants';
     ]),
     PassportModule,
     JwtModule.register({
-      secret: 'secret',
-      signOptions: { expiresIn: '12h' },
+      secret: JWT.ACCESS_SECRET,
+      signOptions: { expiresIn: JWT.ACCESS_DURATION },
     }),
   ],
-  providers: [GatewayAuthService, LocalStrategy, JwtStrategy],
+  providers: [GatewayAuthService, LocalStrategy, JwtStrategy, RefreshStrategy],
   controllers: [GatewayAuthController],
   exports: [GatewayAuthService],
 })
