@@ -1,7 +1,7 @@
 import { User } from './user.entity';
 
 export class UserFrontend {
-  id: number | string;
+  id: number;
   login: string;
   email: string;
 

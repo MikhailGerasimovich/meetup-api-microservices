@@ -5,10 +5,10 @@ import { PrismaService } from '../database/prisma.service';
 export class JwtRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async readJwt(userId: string, refreshToken: string): Promise<string | undefined> {
+  async readJwt(userId: number, refreshToken: string): Promise<string | undefined> {
     const token = await this.prisma.tokens.findFirst({
       where: {
-        userId: Number(userId),
+        userId,
         refreshToken,
       },
       select: {
@@ -19,24 +19,27 @@ export class JwtRepository {
     return token?.refreshToken;
   }
 
-  async saveJwt(userId: string, refreshToken: string): Promise<void> {
+  async saveJwt(userId: number, refreshToken: string): Promise<void> {
     await this.prisma.tokens.create({
       data: {
-        userId: Number(userId),
+        userId,
         refreshToken,
       },
     });
   }
 
-  async deleteJwt(userId: string, refreshToken: string): Promise<void> {
+  async deleteJwt(userId: number, refreshToken: string): Promise<void> {
     await this.prisma.tokens.deleteMany({
-      where: { userId: Number(userId), refreshToken },
+      where: {
+        userId,
+        refreshToken,
+      },
     });
   }
 
-  async deleteAllUserJwt(userId: string): Promise<void> {
+  async deleteAllUserJwt(userId: number): Promise<void> {
     await this.prisma.tokens.deleteMany({
-      where: { userId: Number(userId) },
+      where: { userId },
     });
   }
 }

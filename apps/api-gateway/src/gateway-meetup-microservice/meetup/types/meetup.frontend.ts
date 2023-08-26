@@ -1,7 +1,7 @@
 import { Meetup } from './meetup.entity';
 
 export class MeetupFrontend {
-  id: number | string;
+  id: number;
   title: string;
   description: string;
   date: string;

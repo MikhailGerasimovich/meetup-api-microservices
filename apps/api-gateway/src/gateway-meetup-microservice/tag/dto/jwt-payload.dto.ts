@@ -1,4 +1,4 @@
 export class JwtPayloadDto {
-  id: number | string;
+  id: number;
   roles: string[];
 }

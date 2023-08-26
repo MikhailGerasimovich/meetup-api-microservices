@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Query } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { GatewayUserService } from './gateway-user.service';
 import { JoiValidationPipe, ReadAllResult } from '@app/common';
 import { ReadAllUserSchema } from './schemas/read-all-user.schema';
@@ -21,14 +21,14 @@ export class GatewayUserController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async readById(@Param('id') id: string): Promise<UserFrontend> {
+  async readById(@Param('id', ParseIntPipe) id: number): Promise<UserFrontend> {
     const user = await this.gatewayUserService.readById(id);
     return user;
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id') id: string): Promise<void> {
+  async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.gatewayUserService.deleteById(id);
   }
 }

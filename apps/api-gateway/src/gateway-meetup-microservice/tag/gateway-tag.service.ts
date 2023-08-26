@@ -17,7 +17,7 @@ export class GatewayTagService {
     return tags;
   }
 
-  async readById(id: string): Promise<TagFrontend> {
+  async readById(id: number): Promise<TagFrontend> {
     const tag = await firstValueFrom(this.client.send(MEETUP_METADATA.MP_GET_TAG_BY_ID, { id }));
     return tag;
   }
@@ -27,14 +27,14 @@ export class GatewayTagService {
     return createdTag;
   }
 
-  async update(id: string, updateTagDto: UpdateTagDto): Promise<TagFrontend> {
+  async update(id: number, updateTagDto: UpdateTagDto): Promise<TagFrontend> {
     const updatedTag = await firstValueFrom(
       this.client.send(MEETUP_METADATA.MP_UPDATE_TAG_BY_ID, { id, updateTagDto }),
     );
     return updatedTag;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     await this.client.emit(MEETUP_METADATA.EP_DELETE_TAG_BY_ID, { id });
   }
 }

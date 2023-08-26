@@ -10,6 +10,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { GatewayMeetupService } from './gateway-meetup.service';
 import { ReadAllMeetupSchema } from './schemas/read-all-meetup.schema';
@@ -39,7 +40,7 @@ export class GatewayMeetupController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async readById(@Param('id') id: string): Promise<MeetupFrontend> {
+  async readById(@Param('id', ParseIntPipe) id: number): Promise<MeetupFrontend> {
     const tag = await this.gatewayMeetupService.readById(id);
     return tag;
   }
@@ -57,7 +58,7 @@ export class GatewayMeetupController {
   @Post('join/:meetupId')
   @HttpCode(HttpStatus.CREATED)
   public async joinToMeetup(
-    @Param('meetupId') meetupId: string,
+    @Param('meetupId', ParseIntPipe) meetupId: number,
     @UserFromRequest() member: JwtPayloadDto,
   ): Promise<MeetupFrontend> {
     const meetup = await this.gatewayMeetupService.joinToMeetup(meetupId, member);
@@ -67,7 +68,7 @@ export class GatewayMeetupController {
   @Post('leave/:meetupId')
   @HttpCode(HttpStatus.CREATED)
   public async leaveFromMeetup(
-    @Param('meetupId') meetupId: string,
+    @Param('meetupId', ParseIntPipe) meetupId: number,
     @UserFromRequest() member: JwtPayloadDto,
   ): Promise<MeetupFrontend> {
     const meetup = await this.gatewayMeetupService.leaveFromMeetup(meetupId, member);
@@ -77,7 +78,7 @@ export class GatewayMeetupController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(UpdateMeetupSchema)) updateMeetupDto: UpdateMeetupDto,
   ): Promise<MeetupFrontend> {
     const updatedMeetup = await this.gatewayMeetupService.update(id, updateMeetupDto);
@@ -86,7 +87,7 @@ export class GatewayMeetupController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id') id: string): Promise<void> {
+  async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.gatewayMeetupService.deleteById(id);
   }
 }

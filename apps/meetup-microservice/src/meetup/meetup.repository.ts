@@ -44,9 +44,9 @@ export class MeetupRepository {
     return { totalRecordsNumber, records };
   }
 
-  async readById(id: string): Promise<Meetup> {
+  async readById(id: number): Promise<Meetup> {
     const meetup = await this.prisma.meetups.findUnique({
-      where: { id: Number(id) },
+      where: { id },
       include: {
         tags: {
           select: {
@@ -84,13 +84,13 @@ export class MeetupRepository {
     return createdMeetup;
   }
 
-  async joinToMeetup(meetupId: string, memberId: string): Promise<Meetup> {
+  async joinToMeetup(meetupId: number, memberId: number): Promise<Meetup> {
     const meetup = await this.prisma.meetups.update({
-      where: { id: Number(meetupId) },
+      where: { id: meetupId },
       data: {
         members: {
           create: {
-            userId: Number(memberId),
+            userId: memberId,
           },
         },
       },
@@ -99,13 +99,13 @@ export class MeetupRepository {
     return meetup;
   }
 
-  async leaveFromMeetup(meetupId: string, memberId: string): Promise<Meetup> {
+  async leaveFromMeetup(meetupId: number, memberId: number): Promise<Meetup> {
     const meetup = await this.prisma.meetups.update({
-      where: { id: Number(meetupId) },
+      where: { id: meetupId },
       data: {
         members: {
           deleteMany: {
-            userId: Number(memberId),
+            userId: memberId,
           },
         },
       },
@@ -114,18 +114,18 @@ export class MeetupRepository {
     return meetup;
   }
 
-  async isJoined(meetupId: string, memberId: string): Promise<boolean> {
+  async isJoined(meetupId: number, memberId: number): Promise<boolean> {
     const meetups = await this.prisma.members.findMany({
       where: {
-        meetupId: Number(meetupId),
-        userId: Number(memberId),
+        meetupId: meetupId,
+        userId: memberId,
       },
     });
 
     return meetups.length !== 0;
   }
 
-  async update(id: string, meetupUpdateAttrs: MeetupUpdateAttrs): Promise<Meetup> {
+  async update(id: number, meetupUpdateAttrs: MeetupUpdateAttrs): Promise<Meetup> {
     const data: any = {
       title: meetupUpdateAttrs.title,
       description: String(meetupUpdateAttrs.description),
@@ -142,7 +142,7 @@ export class MeetupRepository {
     }
 
     const updatedMeetup = await this.prisma.meetups.update({
-      where: { id: Number(id) },
+      where: { id },
       data: data,
       include: {
         tags: {
@@ -155,18 +155,18 @@ export class MeetupRepository {
     return updatedMeetup;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     await this.prisma.meetups.update({
-      where: { id: Number(id) },
+      where: { id: id },
       data: {
         tags: {
-          deleteMany: { meetupId: Number(id) },
+          deleteMany: { meetupId: id },
         },
       },
     });
 
     await this.prisma.meetups.delete({
-      where: { id: Number(id) },
+      where: { id: id },
     });
   }
 }

@@ -17,7 +17,7 @@ export class UserService {
     return readAllUser;
   }
 
-  async readById(id: string): Promise<User> {
+  async readById(id: number): Promise<User> {
     const user = await this.userRepository.readById(id);
     return user;
   }
@@ -38,7 +38,7 @@ export class UserService {
     return createdUser;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     const existingUser = await this.userRepository.readById(id);
     if (!existingUser) {
       throw new RpcException({ message: `The specified user does not exist`, statusCode: HttpStatus.BAD_REQUEST });

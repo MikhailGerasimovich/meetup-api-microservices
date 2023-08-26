@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, ParseIntPipe } from '@nestjs/common';
 import { MeetupService } from './meetup.service';
 import { MeetupFrontend } from './types/meetup.frontend';
 import { CreateMeetupDto } from './dto/create-meetup.dto';
@@ -7,7 +7,7 @@ import { IReadAllMeetupOptions } from './types/read-all-meetup.options';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { ReadAllResult } from '@app/common';
 import { METADATA } from '../constants/constants';
-import { JwtPayloadDto } from 'apps/authorization-microservice/src/auth/dto/jwt-payload.dto';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Controller()
 export class MeetupController {
@@ -23,7 +23,7 @@ export class MeetupController {
   }
 
   @MessagePattern(METADATA.MP_GET_MEETUP_BY_ID)
-  async readById(@Payload('id') id: string): Promise<MeetupFrontend> {
+  async readById(@Payload('id', ParseIntPipe) id: number): Promise<MeetupFrontend> {
     const meetup = await this.meetupService.readById(id);
     return new MeetupFrontend(meetup);
   }
@@ -39,7 +39,7 @@ export class MeetupController {
 
   @MessagePattern(METADATA.MP_JOIN_TO_MEETUP)
   async joinToMeetup(
-    @Payload('meetupId') meetupId: string,
+    @Payload('meetupId', ParseIntPipe) meetupId: number,
     @Payload('member') member: JwtPayloadDto,
   ): Promise<MeetupFrontend> {
     const meetup = await this.meetupService.joinToMeetup(meetupId, member);
@@ -48,7 +48,7 @@ export class MeetupController {
 
   @MessagePattern(METADATA.MP_LEAVE_FROM_MEETUP)
   async leaveFromMeetup(
-    @Payload('meetupId') meetupId: string,
+    @Payload('meetupId', ParseIntPipe) meetupId: number,
     @Payload('member') member: JwtPayloadDto,
   ): Promise<MeetupFrontend> {
     const meetup = await this.meetupService.leaveFromMeetup(meetupId, member);
@@ -57,7 +57,7 @@ export class MeetupController {
 
   @MessagePattern(METADATA.MP_UPDATE_MEETUP_BY_ID)
   async update(
-    @Payload('id') id: string,
+    @Payload('id', ParseIntPipe) id: number,
     @Payload('updateMeetupDto') updateMeetupDto: UpdateMeetupDto,
   ): Promise<MeetupFrontend> {
     const updatedMeetup = await this.meetupService.update(id, updateMeetupDto);
@@ -65,7 +65,7 @@ export class MeetupController {
   }
 
   @EventPattern(METADATA.EP_DELETE_MEETUP_BY_ID)
-  async deleteById(@Payload('id') id: string): Promise<void> {
+  async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<void> {
     await this.meetupService.deleteById(id);
   }
 }

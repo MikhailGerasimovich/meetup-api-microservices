@@ -24,7 +24,7 @@ export class MeetupService {
     return readAllMeetups;
   }
 
-  async readById(id: string): Promise<Meetup> {
+  async readById(id: number): Promise<Meetup> {
     const meetup = await this.meetupRepository.readById(id);
     return meetup;
   }
@@ -44,22 +44,18 @@ export class MeetupService {
     return createdMeetup;
   }
 
-  async joinToMeetup(meetupId: string, member: JwtPayloadDto): Promise<Meetup> {
-    const memberId = String(member.id);
-
-    const isJoined = await this.meetupRepository.isJoined(meetupId, memberId);
+  async joinToMeetup(meetupId: number, member: JwtPayloadDto): Promise<Meetup> {
+    const isJoined = await this.meetupRepository.isJoined(meetupId, member.id);
     if (isJoined) {
       throw new RpcException({ message: `You are already joined for this meetup`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
-    const meetup = await this.meetupRepository.joinToMeetup(meetupId, memberId);
+    const meetup = await this.meetupRepository.joinToMeetup(meetupId, member.id);
     return meetup;
   }
 
-  async leaveFromMeetup(meetupId: string, member: JwtPayloadDto): Promise<Meetup> {
-    const memberId = String(member.id);
-
-    const isJoined = await this.meetupRepository.isJoined(meetupId, memberId);
+  async leaveFromMeetup(meetupId: number, member: JwtPayloadDto): Promise<Meetup> {
+    const isJoined = await this.meetupRepository.isJoined(meetupId, member.id);
     if (!isJoined) {
       throw new RpcException({
         message: `You can't leave a meeting you're not in`,
@@ -67,11 +63,11 @@ export class MeetupService {
       });
     }
 
-    const meetup = await this.meetupRepository.leaveFromMeetup(meetupId, memberId);
+    const meetup = await this.meetupRepository.leaveFromMeetup(meetupId, member.id);
     return meetup;
   }
 
-  async update(id: string, updateMeetupDto: UpdateMeetupDto): Promise<Meetup> {
+  async update(id: number, updateMeetupDto: UpdateMeetupDto): Promise<Meetup> {
     const existingMeetup = await this.meetupRepository.readById(id);
     if (!existingMeetup) {
       throw new RpcException({ message: `The specified meetup does not exist`, statusCode: HttpStatus.BAD_REQUEST });
@@ -92,7 +88,7 @@ export class MeetupService {
     return updatedMeetup;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     const existingMeetup = await this.meetupRepository.readById(id);
     if (!existingMeetup) {
       throw new RpcException({ message: `The specified meetup does not exist`, statusCode: HttpStatus.BAD_REQUEST });

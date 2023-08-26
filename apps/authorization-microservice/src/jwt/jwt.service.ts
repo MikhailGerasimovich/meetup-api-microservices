@@ -41,20 +41,20 @@ export class JwtService {
     return true;
   }
 
-  public async readJwt(userId: string, refreshToken: string): Promise<string | undefined> {
+  public async readJwt(userId: number, refreshToken: string): Promise<string | undefined> {
     const jwt = await this.jwtRepository.readJwt(userId, refreshToken);
     return jwt;
   }
 
-  public async saveJwt(userId: string, refreshToken: string): Promise<void> {
+  public async saveJwt(userId: number, refreshToken: string): Promise<void> {
     await this.jwtRepository.saveJwt(userId, refreshToken);
   }
 
-  public async deleteJwt(userId: string, refreshToken: string): Promise<void> {
+  public async deleteJwt(userId: number, refreshToken: string): Promise<void> {
     await this.jwtRepository.deleteJwt(userId, refreshToken);
   }
 
-  public async deleteAllUserJwt(userId: string): Promise<void> {
+  public async deleteAllUserJwt(userId: number): Promise<void> {
     await this.jwtRepository.deleteAllUserJwt(userId);
   }
 }

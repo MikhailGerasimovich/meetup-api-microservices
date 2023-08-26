@@ -39,9 +39,9 @@ export class UserRepository {
     return { totalRecordsNumber, records };
   }
 
-  async readById(id: string): Promise<User> {
+  async readById(id: number): Promise<User> {
     const user = await this.prisma.users.findUnique({
-      where: { id: Number(id) },
+      where: { id },
 
       select: {
         id: true,
@@ -88,9 +88,9 @@ export class UserRepository {
     return createdUser;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     await this.prisma.users.delete({
-      where: { id: Number(id) },
+      where: { id },
     });
   }
 }

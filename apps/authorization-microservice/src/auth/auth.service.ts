@@ -46,34 +46,32 @@ export class AuthService {
     const accessToken = await this.jwtService.generateAccessJwt(payload);
     const refreshToken = await this.jwtService.generateRefreshJwt(payload);
 
-    await this.jwtService.saveJwt(String(user.id), refreshToken);
+    await this.jwtService.saveJwt(user.id, refreshToken);
 
     return { accessToken, refreshToken };
   }
 
   public async refresh(userPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
-    const userId = String(userPayload.id);
-
-    const token = await this.jwtService.readJwt(userId, refreshToken);
+    const token = await this.jwtService.readJwt(userPayload.id, refreshToken);
 
     if (!token) {
-      await this.jwtService.deleteAllUserJwt(userId);
+      await this.jwtService.deleteAllUserJwt(userPayload.id);
       throw new RpcException({ message: 'Need to login', statusCode: HttpStatus.UNAUTHORIZED });
     }
 
     const isValidToken = await this.jwtService.isValidRefreshJwt(token);
     if (!isValidToken) {
-      await this.jwtService.deleteJwt(userId, refreshToken);
+      await this.jwtService.deleteJwt(userPayload.id, refreshToken);
       throw new RpcException({ message: 'Need to login', statusCode: HttpStatus.UNAUTHORIZED });
     }
 
-    await this.jwtService.deleteJwt(userId, refreshToken);
+    await this.jwtService.deleteJwt(userPayload.id, refreshToken);
 
     const payload = { id: userPayload.id, roles: userPayload.roles };
     const newAccessToken = await this.jwtService.generateAccessJwt(payload);
     const newRefreshToken = await this.jwtService.generateRefreshJwt(payload);
 
-    await this.jwtService.saveJwt(userId, newRefreshToken);
+    await this.jwtService.saveJwt(userPayload.id, newRefreshToken);
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }

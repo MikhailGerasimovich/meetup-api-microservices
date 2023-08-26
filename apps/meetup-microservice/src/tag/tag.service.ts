@@ -18,7 +18,7 @@ export class TagService {
     return readAllTags;
   }
 
-  async readById(id: string): Promise<Tag> {
+  async readById(id: number): Promise<Tag> {
     const tag = await this.tagRepository.readById(id);
     return tag;
   }
@@ -36,7 +36,7 @@ export class TagService {
     return createdTag;
   }
 
-  async update(id: string, updateTagDto: UpdateTagDto): Promise<Tag> {
+  async update(id: number, updateTagDto: UpdateTagDto): Promise<Tag> {
     const existingTag = await this.tagRepository.readById(id);
     if (!existingTag) {
       throw new RpcException({ message: `The specified tag does not exist`, statusCode: HttpStatus.BAD_REQUEST });
@@ -50,7 +50,7 @@ export class TagService {
     return updatedTag;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     const existingTag = await this.tagRepository.readById(id);
     if (!existingTag) {
       throw new RpcException({ message: `The specified tag does not exist`, statusCode: HttpStatus.BAD_REQUEST });

@@ -1,6 +1,5 @@
 import { Controller } from '@nestjs/common';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { UserFrontend } from '../user/types/user.frontend';
 import { AuthService } from './auth.service';
 import { User } from '../user/types/user.entity';
 import { JwtType } from './types/jwt.type';

@@ -1,7 +1,7 @@
 import { Tag } from '../../tag/types/tag.entity';
 
 export class Meetup {
-  id: number | string;
+  id: number;
   title: string;
   description: string;
   date: string;

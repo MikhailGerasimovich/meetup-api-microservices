@@ -1,7 +1,7 @@
 import { Tag } from './tag.entity';
 
 export class TagFrontend {
-  id: number | string;
+  id: number;
   title: string;
 
   constructor(tag: Tag) {

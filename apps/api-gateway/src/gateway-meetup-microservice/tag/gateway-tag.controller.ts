@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { GatewayTagService } from './gateway-tag.service';
 import { JoiValidationPipe, ReadAllResult } from '@app/common';
 import { ReadAllTagSchema } from './schemas/read-all-tag.schema';
@@ -25,7 +37,7 @@ export class GatewayTagController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async readById(@Param('id') id: string): Promise<TagFrontend> {
+  async readById(@Param('id', ParseIntPipe) id: number): Promise<TagFrontend> {
     const tag = await this.gatewayTagService.readById(id);
     return tag;
   }
@@ -40,7 +52,7 @@ export class GatewayTagController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(UpdateTagSchema)) updateTagDto: UpdateTagDto,
   ): Promise<TagFrontend> {
     const updatedTag = await this.gatewayTagService.update(id, updateTagDto);
@@ -49,7 +61,7 @@ export class GatewayTagController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id') id: string): Promise<void> {
+  async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.gatewayTagService.deleteById(id);
   }
 }

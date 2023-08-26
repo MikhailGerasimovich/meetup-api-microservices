@@ -35,9 +35,9 @@ export class TagRepository {
     return { totalRecordsNumber, records };
   }
 
-  async readById(id: string): Promise<Tag> {
+  async readById(id: number): Promise<Tag> {
     const tag = await this.prisma.tags.findUnique({
-      where: { id: Number(id) },
+      where: { id },
     });
     return tag;
   }
@@ -58,9 +58,9 @@ export class TagRepository {
     return createdTag;
   }
 
-  async update(id: string, tagUpdateAttrs: TagUpdateAttrs): Promise<Tag> {
+  async update(id: number, tagUpdateAttrs: TagUpdateAttrs): Promise<Tag> {
     const updatedTag = await this.prisma.tags.update({
-      where: { id: Number(id) },
+      where: { id },
       data: {
         title: tagUpdateAttrs.title,
       },
@@ -68,9 +68,9 @@ export class TagRepository {
     return updatedTag;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     await this.prisma.tags.delete({
-      where: { id: Number(id) },
+      where: { id },
     });
   }
 }

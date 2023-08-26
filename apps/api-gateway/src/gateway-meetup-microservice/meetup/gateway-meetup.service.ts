@@ -18,7 +18,7 @@ export class GatewayMeetupService {
     return meetups;
   }
 
-  async readById(id: string): Promise<MeetupFrontend> {
+  async readById(id: number): Promise<MeetupFrontend> {
     const meetup = await firstValueFrom(this.client.send(MEETUP_METADATA.MP_GET_MEETUP_BY_ID, { id }));
     return meetup;
   }
@@ -30,24 +30,24 @@ export class GatewayMeetupService {
     return createdMeetup;
   }
 
-  async joinToMeetup(meetupId: string, member: JwtPayloadDto): Promise<MeetupFrontend> {
+  async joinToMeetup(meetupId: number, member: JwtPayloadDto): Promise<MeetupFrontend> {
     const meetup = await firstValueFrom(this.client.send(MEETUP_METADATA.MP_JOIN_TO_MEETUP, { meetupId, member }));
     return meetup;
   }
 
-  async leaveFromMeetup(meetupId: string, member: JwtPayloadDto): Promise<MeetupFrontend> {
+  async leaveFromMeetup(meetupId: number, member: JwtPayloadDto): Promise<MeetupFrontend> {
     const meetup = await firstValueFrom(this.client.send(MEETUP_METADATA.MP_LEAVE_FROM_MEETUP, { meetupId, member }));
     return meetup;
   }
 
-  async update(id: string, updateTagDto: UpdateMeetupDto): Promise<MeetupFrontend> {
+  async update(id: number, updateTagDto: UpdateMeetupDto): Promise<MeetupFrontend> {
     const updatedTag = await firstValueFrom(
       this.client.send(MEETUP_METADATA.MP_UPDATE_MEETUP_BY_ID, { id, updateTagDto }),
     );
     return updatedTag;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     await this.client.emit(MEETUP_METADATA.EP_DELETE_MEETUP_BY_ID, { id });
   }
 }

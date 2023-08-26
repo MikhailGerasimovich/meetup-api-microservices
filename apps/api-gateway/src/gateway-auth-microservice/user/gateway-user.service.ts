@@ -15,12 +15,12 @@ export class GatewayUserService {
     return users;
   }
 
-  async readById(id: string): Promise<UserFrontend> {
+  async readById(id: number): Promise<UserFrontend> {
     const user = await firstValueFrom(this.client.send(AUTH_METADATA.MP_GET_USER_BY_ID, { id }));
     return user;
   }
 
-  async deleteById(id: string): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     await this.client.emit(AUTH_METADATA.EP_DELETE_USER_BY_ID, { id });
   }
 }
