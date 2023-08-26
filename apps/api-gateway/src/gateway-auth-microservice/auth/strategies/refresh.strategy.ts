@@ -24,8 +24,6 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
   }
 
   async validate(payload: JwtPayloadDto) {
-    console.log(payload);
-
     if (!payload) {
       throw new BadRequestException('missing refresh jwt');
     }
