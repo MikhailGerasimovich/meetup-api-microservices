@@ -6,5 +6,5 @@ export class ReadAllMeetupDto extends BaseReadAllDto {
   date?: string;
   place?: string;
   tags: string[];
-  organizerId: number | string;
+  organizerId: number;
 }

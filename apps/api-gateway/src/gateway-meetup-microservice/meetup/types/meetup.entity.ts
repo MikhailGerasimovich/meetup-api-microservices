@@ -1,4 +1,7 @@
-import { Tag } from '../../tag/types/tag.entity';
+class Tag {
+  id: number;
+  title: string;
+}
 
 export class Meetup {
   id: number;
@@ -7,5 +10,5 @@ export class Meetup {
   date: string;
   place: string;
   tags?: { tag: Tag }[];
-  organizerId: number | string;
+  organizerId: number;
 }
