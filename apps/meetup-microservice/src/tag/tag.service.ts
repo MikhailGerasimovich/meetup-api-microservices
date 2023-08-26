@@ -27,6 +27,10 @@ export class TagService {
     return createdTag;
   }
 
+  async isRelated(id: number): Promise<boolean> {
+    return await this.tagRepository.isRelated(id);
+  }
+
   async deleteById(id: number): Promise<void> {
     const existingTag = await this.tagRepository.readById(id);
     if (!existingTag) {

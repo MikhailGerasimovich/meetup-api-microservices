@@ -29,6 +29,17 @@ export class TagRepository {
     });
     return createdTag;
   }
+
+  async isRelated(id: number): Promise<boolean> {
+    const count = await this.prisma.meetupsToTags.count({
+      where: {
+        tagId: id,
+      },
+    });
+
+    return count ? true : false;
+  }
+
   async deleteById(id: number): Promise<void> {
     await this.prisma.tags.delete({
       where: { id },

@@ -5,6 +5,6 @@ export class MeetupUpdateAttrs {
   description?: string;
   date?: string;
   place?: string;
-  organizerId?: number | string;
+  organizerId?: number;
   tags?: Tag[];
 }

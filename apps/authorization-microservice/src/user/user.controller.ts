@@ -26,7 +26,7 @@ export class UserController {
   }
 
   @EventPattern(AUTH_METADATA.EP_DELETE_USER_BY_ID)
-  async deleteById(@Payload('id', ParseIntPipe) id: string): Promise<void> {
+  async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<void> {
     await this.userService.deleteById(id);
   }
 }

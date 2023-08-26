@@ -6,5 +6,5 @@ export class MeetupCreationAttrs {
   date: string;
   place: string;
   tags: Tag[];
-  organizerId: number | string;
+  organizerId: number;
 }

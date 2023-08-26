@@ -6,9 +6,9 @@ export class MeetupFrontend {
   description: string;
   date: string;
   place: string;
-  organiserId: string | number;
+  organiserId: number;
   tags?: {
-    id?: number | string;
+    id?: number;
     title?: string;
   }[];
 

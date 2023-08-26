@@ -7,7 +7,7 @@ export interface IReadAllMeetupOptions {
     date?: string;
     place?: string;
     tags: string[];
-    organizerId: number | string;
+    organizerId: number;
   };
   pagination?: IPaginationOptions;
   sorting?: ISortingOptions;

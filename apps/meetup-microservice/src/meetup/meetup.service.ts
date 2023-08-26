@@ -94,7 +94,9 @@ export class MeetupService {
       throw new RpcException({ message: `The specified meetup does not exist`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
+    const tags = existingMeetup.tags.map((obj) => obj.tag);
     await this.meetupRepository.deleteById(id);
+    await this._deleteUnrelatedTags(tags);
   }
 
   private async _createTagsIfNotExist(tagsTitle: string[]): Promise<Tag[]> {
@@ -108,5 +110,14 @@ export class MeetupService {
       tags.push(existingTag);
     }
     return tags;
+  }
+
+  private async _deleteUnrelatedTags(tags: Tag[]) {
+    for await (let tag of tags) {
+      const isRelatedTag = await this.tagService.isRelated(tag.id);
+      if (!isRelatedTag) {
+        await this.tagService.deleteById(tag.id);
+      }
+    }
   }
 }
