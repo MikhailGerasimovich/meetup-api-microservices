@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ApiGatewayModule } from './api-gateway.module';
 import { config } from 'dotenv';
 import * as cookieParser from 'cookie-parser';
-import { APPLICATION } from './constants/constants';
+import { APPLICATION } from './common/constants/constants';
 
 config();
 

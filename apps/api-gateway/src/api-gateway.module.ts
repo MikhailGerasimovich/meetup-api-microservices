@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { GatewayMeetupMicroserviceModule } from './gateway-meetup-microservice/gateway-meetup-microservice.module';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from '@app/common';
-import { GatewayAuthMicroserviceModule } from './gateway-auth-microservice/gateway-auth-microservice.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { MeetupModule } from './modules/meetup/meetup.module';
 
 @Module({
-  imports: [GatewayMeetupMicroserviceModule, GatewayAuthMicroserviceModule],
+  imports: [AuthModule, UserModule, MeetupModule],
   providers: [
     {
       provide: APP_FILTER,

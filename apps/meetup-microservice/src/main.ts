@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { MeetupMicroserviceModule } from './meetup-microservice.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { config } from 'dotenv';
-import { MEETUP_MICROSERVICE } from './constants/constants';
+import { MEETUP_MICROSERVICE } from './common/constants/constants';
 
 config();
 
