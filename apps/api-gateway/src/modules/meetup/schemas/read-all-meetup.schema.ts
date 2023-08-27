@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 import { PaginationDto, SortingDto } from '@app/common';
-import { ReadAllMeetupDto } from '../dto/read-all-meetup.dto';
+import { ReadAllMeetupDto } from '../dto';
 
 export const ReadAllMeetupSchema = Joi.object<ReadAllMeetupDto>({
   title: Joi.string().optional(),

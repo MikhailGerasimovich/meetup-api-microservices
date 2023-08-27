@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 import { PaginationDto, SortingDto } from '@app/common';
-import { ReadAllUserDto } from '../dto/read-all-user.dto';
+import { ReadAllUserDto } from '../dto';
 
 export const ReadAllUserSchema = Joi.object<ReadAllUserDto>({
   login: Joi.string().optional(),

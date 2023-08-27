@@ -73,17 +73,18 @@ export class UserRepository {
         login: userCreationAttrs.login,
         email: userCreationAttrs.email,
         password: userCreationAttrs.password,
-        roles: userCreationAttrs.roles,
+        role: userCreationAttrs.role,
       },
 
       select: {
         id: true,
         login: true,
         email: true,
-        roles: true,
+        role: true,
       },
     });
-    return createdUser;
+
+    return <UserEntity>createdUser;
   }
 
   async deleteById(id: number): Promise<void> {

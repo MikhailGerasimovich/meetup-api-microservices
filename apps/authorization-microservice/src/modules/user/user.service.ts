@@ -1,10 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { ReadAllResult } from '@app/common';
+import { ReadAllResult, ROLES } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
 import { IReadAllUserOptions, UserEntity, UserCreationAttrs } from './types';
 import { CreateUserDto } from './dto';
-import { ROLES_NAME } from '../../common';
 
 @Injectable()
 export class UserService {
@@ -30,7 +29,7 @@ export class UserService {
       login: createUserDto.login,
       email: createUserDto.email,
       password: createUserDto.password,
-      roles: [ROLES_NAME.USER],
+      role: ROLES.USER,
     };
     const createdUser = await this.userRepository.create(userCreationAttrs);
     return createdUser;

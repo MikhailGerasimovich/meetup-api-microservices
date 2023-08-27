@@ -8,12 +8,17 @@ datasource db {
   url      = "postgresql://postgres:957483@localhost:5432/authorization_microservice_db?schema=public"
 }
 
+enum Roles {
+  USER
+  ADMIN
+}
+
 model Users {
   id       Int      @id @unique @default(autoincrement())
   login    String   @unique
   email    String   @unique
   password String
-  roles    String[]
+  role     Roles    @default(USER)
   tokens   Tokens[]
 }
 

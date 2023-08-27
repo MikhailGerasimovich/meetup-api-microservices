@@ -15,10 +15,10 @@ export class AuthService {
   ) {}
 
   public async validateUser(login: string, password: string): Promise<JwtPayloadDto> {
-    const candidate = await this.userService.readByLogin(login, ['password', 'roles']);
+    const candidate = await this.userService.readByLogin(login, ['password', 'role']);
 
     if (candidate && compareSync(password, candidate.password)) {
-      return { id: candidate.id, roles: candidate.roles };
+      return { id: candidate.id, role: candidate.role };
     }
 
     throw new RpcException({ message: 'wrong login or password', statusCode: HttpStatus.BAD_REQUEST });
@@ -31,7 +31,9 @@ export class AuthService {
       password: hashPassword,
     });
 
-    const payload = { id: registratedUser.id, roles: registratedUser.roles };
+    console.log(registratedUser);
+
+    const payload = { id: registratedUser.id, role: registratedUser.role };
 
     const accessToken = await this.jwtService.generateAccessJwt(payload);
     const refreshToken = await this.jwtService.generateRefreshJwt(payload);
@@ -40,7 +42,7 @@ export class AuthService {
   }
 
   public async login(user: UserEntity): Promise<JwtType> {
-    const payload = { id: user.id, roles: user.roles };
+    const payload = { id: user.id, role: user.role };
 
     const accessToken = await this.jwtService.generateAccessJwt(payload);
     const refreshToken = await this.jwtService.generateRefreshJwt(payload);
@@ -66,7 +68,7 @@ export class AuthService {
 
     await this.jwtService.deleteJwt(userPayload.id, refreshToken);
 
-    const payload = { id: userPayload.id, roles: userPayload.roles };
+    const payload = { id: userPayload.id, role: userPayload.role };
     const newAccessToken = await this.jwtService.generateAccessJwt(payload);
     const newRefreshToken = await this.jwtService.generateRefreshJwt(payload);
 

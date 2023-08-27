@@ -1,15 +1,17 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JoiValidationPipe } from '../../common';
+import { JoiValidationPipe, JwtAuthGuard, Roles, RolesGuard } from '../../common';
 import { ReadAllUserSchema } from './schemas';
 import { ReadAllUserDto } from './dto';
-import { ReadAllResult } from '@app/common';
+import { ROLES, ReadAllResult } from '@app/common';
 import { UserType } from './types';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Roles(ROLES.USER)
   @Get()
   @HttpCode(HttpStatus.OK)
   async readAll(
