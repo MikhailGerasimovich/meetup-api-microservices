@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { UserRepository } from './user.repository';
-import { ReadAllResult, ROLES } from '@app/common';
 import { RpcException } from '@nestjs/microservices';
+import { ReadAllResult, ROLES } from '@app/common';
+import { UserRepository } from './user.repository';
 import { IReadAllUserOptions, UserEntity, UserCreationAttrs } from './types';
 import { CreateUserDto } from './dto';
 

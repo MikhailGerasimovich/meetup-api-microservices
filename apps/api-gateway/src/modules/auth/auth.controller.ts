@@ -1,11 +1,11 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { JwtPayloadDto, JwtType } from '@app/common';
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
 import { JoiValidationPipe, LocalAuthGuard, RefreshGuard, UserFromRequest } from '../../common';
 import { RegistrationUserSchema } from './schemas';
+import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto';
 import { UserEntity } from './types';
-import { JwtPayloadDto, JwtType } from '@app/common';
 
 @Controller('auth')
 export class AuthController {

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { JwtModule as NestJwtModule } from '@nestjs/jwt';
+import { JWT } from '../../common';
+import { DatabaseModule } from '../../database/database.module';
 import { JwtRepository } from './jwt.repository';
 import { JwtService } from './jwt.service';
-import { DatabaseModule } from '../../database/database.module';
-import { JWT } from '../../common';
 
 @Module({
   imports: [

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
 import { AUTH_MICROSERVICE, JWT } from '../../common';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
 import { JwtStrategy, LocalStrategy, RefreshStrategy } from './strategies';
 
 @Module({

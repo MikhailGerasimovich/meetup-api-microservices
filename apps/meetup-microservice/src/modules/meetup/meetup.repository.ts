@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ReadAllResult, defaultPagination, defaultSorting, offset } from '@app/common';
+import { PrismaService } from '../database/prisma.service';
 import { IReadAllMeetupOptions, MeetupEntity, MeetupCreationAttrs, MeetupUpdateAttrs } from './types';
 import { getMeetupFilters } from './filters';
-import { PrismaService } from '../database/prisma.service';
 
 @Injectable()
 export class MeetupRepository {

@@ -1,9 +1,9 @@
 import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import { ROLES, ReadAllResult } from '@app/common';
 import { UserService } from './user.service';
 import { JoiValidationPipe, JwtAuthGuard, Roles, RolesGuard } from '../../common';
 import { ReadAllUserSchema } from './schemas';
 import { ReadAllUserDto } from './dto';
-import { ROLES, ReadAllResult } from '@app/common';
 import { UserType } from './types';
 
 @UseGuards(JwtAuthGuard, RolesGuard)

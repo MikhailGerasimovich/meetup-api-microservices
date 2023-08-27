@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { TagRepository } from './tag.repository';
 import { RpcException } from '@nestjs/microservices';
+import { TagRepository } from './tag.repository';
 import { TagEntity, TagCreationAttrs } from './types';
 import { CreateTagDto } from './dto';
 

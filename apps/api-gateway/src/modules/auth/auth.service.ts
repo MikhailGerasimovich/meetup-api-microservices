@@ -1,11 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { UserEntity } from './types/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
 import { firstValueFrom } from 'rxjs';
-import { AUTH_MICROSERVICE } from '../../common';
 import { JwtPayloadDto, JwtType, METADATA } from '@app/common';
-
+import { AUTH_MICROSERVICE } from '../../common';
+import { CreateUserDto } from './dto';
+import { UserEntity } from './types';
 @Injectable()
 export class AuthService {
   constructor(@Inject(AUTH_MICROSERVICE.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}

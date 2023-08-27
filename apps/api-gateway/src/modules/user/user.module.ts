@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { AUTH_MICROSERVICE } from '../../common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { AUTH_MICROSERVICE } from '../../common';
 
 @Module({
   imports: [

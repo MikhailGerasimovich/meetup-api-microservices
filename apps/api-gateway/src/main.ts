@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { ApiGatewayModule } from './api-gateway.module';
-import { config } from 'dotenv';
 import * as cookieParser from 'cookie-parser';
-import { APPLICATION } from './common/constants/constants';
+import { config } from 'dotenv';
+import { ApiGatewayModule } from './api-gateway.module';
+import { APPLICATION } from './common';
 
 config();
 

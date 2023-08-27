@@ -1,7 +1,7 @@
 import { Controller, ParseIntPipe } from '@nestjs/common';
-import { UserService } from './user.service';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { METADATA, ReadAllResult } from '@app/common';
+import { UserService } from './user.service';
 import { IReadAllUserOptions, UserType } from './types';
 
 @Controller()

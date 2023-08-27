@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { AuthorizationMicroserviceModule } from './authorization-microservice.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { AuthorizationMicroserviceModule } from './authorization-microservice.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AuthorizationMicroserviceModule, {

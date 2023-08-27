@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { METADATA, ReadAllResult } from '@app/common';
 import { firstValueFrom } from 'rxjs';
+import { METADATA, ReadAllResult } from '@app/common';
 import { AUTH_MICROSERVICE } from '../../common';
 import { IReadAllUserOptions, UserType } from './types';
 

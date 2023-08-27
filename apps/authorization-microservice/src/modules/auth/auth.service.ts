@@ -1,9 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { UserService } from '../user/user.service';
-import { compareSync, hash } from 'bcryptjs';
 import { RpcException } from '@nestjs/microservices';
-import { JwtService } from '../jwt/jwt.service';
+import { compareSync, hash } from 'bcryptjs';
 import { JwtPayloadDto, JwtType } from '@app/common';
+import { JwtService } from '../jwt/jwt.service';
+import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto';
 import { UserEntity } from '../user/types';
 

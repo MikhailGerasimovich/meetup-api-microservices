@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ReadAllResult, defaultPagination, defaultSorting, offset } from '@app/common';
-import { getUserFilters } from './filters/read-all-user.filter';
 import { PrismaService } from '../../database/prisma.service';
+import { getUserFilters } from './filters/read-all-user.filter';
 import { IReadAllUserOptions, UserEntity, UserCreationAttrs } from './types';
 
 @Injectable()

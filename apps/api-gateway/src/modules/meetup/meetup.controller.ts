@@ -12,9 +12,9 @@ import {
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
-import { MeetupService } from './meetup.service';
-import { JoiValidationPipe, JwtAuthGuard, RolesGuard, UserFromRequest } from '../../common';
 import { JwtPayloadDto, ReadAllResult } from '@app/common';
+import { JoiValidationPipe, JwtAuthGuard, RolesGuard, UserFromRequest } from '../../common';
+import { MeetupService } from './meetup.service';
 import { CreateMeetupSchema, ReadAllMeetupSchema, UpdateMeetupSchema } from './schemas';
 import { CreateMeetupDto, ReadAllMeetupDto, UpdateMeetupDto } from './dto';
 import { MeetupType } from './types';

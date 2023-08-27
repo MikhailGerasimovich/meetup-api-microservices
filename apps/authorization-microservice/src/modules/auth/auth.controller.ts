@@ -1,8 +1,8 @@
 import { Controller } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CreateUserDto } from '../user/dto';
 import { JwtPayloadDto, JwtType, METADATA } from '@app/common';
+import { AuthService } from './auth.service';
+import { CreateUserDto } from '../user/dto';
 import { UserEntity } from '../user/types';
 
 @Controller()

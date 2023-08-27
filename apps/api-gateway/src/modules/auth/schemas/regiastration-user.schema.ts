@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { CreateUserDto } from '../dto';
 
 export const RegistrationUserSchema = Joi.object<CreateUserDto>({
   login: Joi.string().required(),
