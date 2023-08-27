@@ -1,8 +1,7 @@
 import { Controller, ParseIntPipe } from '@nestjs/common';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
-import { JwtPayloadDto, ReadAllResult } from '@app/common';
+import { JwtPayloadDto, METADATA, ReadAllResult } from '@app/common';
 import { MeetupService } from './meetup.service';
-import { METADATA } from '../../common';
 import { IReadAllMeetupOptions, MeetupType } from './types';
 import { CreateMeetupDto, UpdateMeetupDto } from './dto';
 

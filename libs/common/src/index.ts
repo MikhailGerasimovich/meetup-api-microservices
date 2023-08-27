@@ -11,3 +11,4 @@ export * from './filters/all-exceptions.filter';
 export * from './filters/microservice-all-exception.filter';
 export * from './dto/jwt-payload.dto';
 export * from './types/jwt.type';
+export * from './constants/rmq-metadata.constants';
