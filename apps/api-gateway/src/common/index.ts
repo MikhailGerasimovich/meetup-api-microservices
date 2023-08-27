@@ -9,3 +9,5 @@ export * from './guards/refresh.guard';
 export * from './guards/role.guard';
 
 export * from './pipes/joi-validation.pipe';
+
+export * from './utils/setup-auth-cookie';

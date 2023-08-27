@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { JwtPayloadDto, JwtType } from '@app/common';
+import { JwtPayloadDto } from '@app/common';
 import { Request, Response } from 'express';
-import { JoiValidationPipe, LocalAuthGuard, RefreshGuard, UserFromRequest } from '../../common';
+import { JoiValidationPipe, LocalAuthGuard, RefreshGuard, UserFromRequest, setupAuthCookie } from '../../common';
 import { RegistrationUserSchema } from './schemas';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto';
@@ -16,19 +16,19 @@ export class AuthController {
   public async registration(
     @Body(new JoiValidationPipe(RegistrationUserSchema)) createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<JwtType> {
+  ): Promise<void> {
     const tokens = await this.gatewayAuthService.registration(createUserDto);
-    res.cookie('auth-cookie', tokens, { httpOnly: true });
-    return tokens;
+    setupAuthCookie(res, tokens);
+    return;
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  public async login(@UserFromRequest() user: UserEntity, @Res({ passthrough: true }) res: Response): Promise<JwtType> {
+  public async login(@UserFromRequest() user: UserEntity, @Res({ passthrough: true }) res: Response): Promise<void> {
     const tokens = await this.gatewayAuthService.login(user);
-    res.cookie('auth-cookie', tokens, { httpOnly: true });
-    return tokens;
+    setupAuthCookie(res, tokens);
+    return;
   }
 
   @UseGuards(RefreshGuard)
@@ -38,10 +38,10 @@ export class AuthController {
     @UserFromRequest() userPayload: JwtPayloadDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<JwtType> {
+  ): Promise<void> {
     const { refreshToken } = req?.cookies['auth-cookie'];
     const tokens = await this.gatewayAuthService.refresh(userPayload, refreshToken);
-    res.cookie('auth-cookie', tokens, { httpOnly: true });
-    return tokens;
+    setupAuthCookie(res, tokens);
+    return;
   }
 }
