@@ -4,10 +4,14 @@ import { ReadAllResult, ROLES } from '@app/common';
 import { UserRepository } from './user.repository';
 import { IReadAllUserOptions, UserEntity, UserCreationAttrs } from './types';
 import { CreateUserDto } from './dto';
+import { JwtService } from '../jwt/jwt.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async readAll(readAllOptions: IReadAllUserOptions): Promise<ReadAllResult<UserEntity>> {
     const readAllUser = await this.userRepository.readAll(readAllOptions);
@@ -41,6 +45,7 @@ export class UserService {
       throw new RpcException({ message: `The specified user does not exist`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
+    await this.jwtService.deleteAllUserJwt(id);
     await this.userRepository.deleteById(id);
   }
 }

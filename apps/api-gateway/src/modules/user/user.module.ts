@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { AUTH_MICROSERVICE } from '../../common';
-import { UserController } from './user.controller';
+import { AUTH_MICROSERVICE, JWT } from '../../common';
 import { UserService } from './user.service';
+import { UserController } from './user.controller';
 
 @Module({
   imports: [
@@ -23,8 +23,8 @@ import { UserService } from './user.service';
     ]),
     PassportModule,
     JwtModule.register({
-      secret: 'secret',
-      signOptions: { expiresIn: '12h' },
+      secret: JWT.ACCESS_SECRET,
+      signOptions: { expiresIn: JWT.ACCESS_DURATION },
     }),
   ],
   providers: [UserService],
