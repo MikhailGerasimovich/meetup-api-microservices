@@ -52,6 +52,10 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  public async logout(userPayload: JwtPayloadDto, refreshToken: string): Promise<void> {
+    await this.jwtService.deleteJwt(userPayload.id, refreshToken);
+  }
+
   public async refresh(userPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
     const token = await this.jwtService.readJwt(userPayload.id, refreshToken);
 

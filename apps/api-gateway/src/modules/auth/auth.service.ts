@@ -28,6 +28,14 @@ export class AuthService {
     return tokens;
   }
 
+  public async logout(userPayload: JwtPayloadDto, refreshToken: string): Promise<void> {
+    await sendMessage({
+      client: this.client,
+      metadata: METADATA.MP_LOGOUT,
+      data: { userPayload, refreshToken },
+    });
+  }
+
   public async refresh(userPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
     const tokens = await sendMessage<JwtType>({
       client: this.client,

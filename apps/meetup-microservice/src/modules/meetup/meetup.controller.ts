@@ -1,5 +1,5 @@
 import { Controller, ParseIntPipe } from '@nestjs/common';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { JwtPayloadDto, METADATA, ReadAllResult } from '@app/common';
 import { MeetupService } from './meetup.service';
 import { IReadAllMeetupOptions, MeetupType } from './types';
@@ -60,7 +60,7 @@ export class MeetupController {
     return new MeetupType(updatedMeetup);
   }
 
-  @EventPattern(METADATA.EP_DELETE_MEETUP_BY_ID)
+  @MessagePattern(METADATA.EP_DELETE_MEETUP_BY_ID)
   async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<void> {
     await this.meetupService.deleteById(id);
   }

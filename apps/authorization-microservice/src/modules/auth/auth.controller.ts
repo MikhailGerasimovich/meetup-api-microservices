@@ -15,18 +15,27 @@ export class AuthController {
     return new JwtType(tokens.accessToken, tokens.refreshToken);
   }
 
+  @MessagePattern(METADATA.MP_LOGIN)
+  public async login(@Payload() user: UserEntity): Promise<JwtType> {
+    const tokens = await this.authService.login(user);
+    return new JwtType(tokens.accessToken, tokens.refreshToken);
+  }
+
+  @MessagePattern(METADATA.MP_LOGOUT)
+  public async logout(
+    @Payload('userPayload') userPayload: JwtPayloadDto,
+    @Payload('refreshToken') refreshToken: string,
+  ): Promise<string> {
+    await this.authService.logout(userPayload, refreshToken);
+    return 'success';
+  }
+
   @MessagePattern(METADATA.MP_REFRESH)
   public async refresh(
     @Payload('userPayload') userPayload: JwtPayloadDto,
     @Payload('refreshToken') refreshToken: string,
   ): Promise<JwtType> {
     const tokens = await this.authService.refresh(userPayload, refreshToken);
-    return new JwtType(tokens.accessToken, tokens.refreshToken);
-  }
-
-  @MessagePattern(METADATA.MP_LOGIN)
-  public async login(@Payload() user: UserEntity): Promise<JwtType> {
-    const tokens = await this.authService.login(user);
     return new JwtType(tokens.accessToken, tokens.refreshToken);
   }
 

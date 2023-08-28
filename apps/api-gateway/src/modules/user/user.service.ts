@@ -29,7 +29,7 @@ export class UserService {
   }
 
   async deleteById(id: number): Promise<void> {
-    await sendMessage({
+    await sendMessage<void>({
       client: this.client,
       metadata: METADATA.EP_DELETE_USER_BY_ID,
       data: { id },

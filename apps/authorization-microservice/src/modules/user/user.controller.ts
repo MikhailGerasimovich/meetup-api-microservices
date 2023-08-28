@@ -1,5 +1,5 @@
 import { Controller, ParseIntPipe } from '@nestjs/common';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { METADATA, ReadAllResult } from '@app/common';
 import { UserService } from './user.service';
 import { IReadAllUserOptions, UserType } from './types';
@@ -23,8 +23,9 @@ export class UserController {
     return new UserType(user);
   }
 
-  @EventPattern(METADATA.EP_DELETE_USER_BY_ID)
-  async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<void> {
+  @MessagePattern(METADATA.EP_DELETE_USER_BY_ID)
+  async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<string> {
     await this.userService.deleteById(id);
+    return 'success';
   }
 }
