@@ -1,11 +1,35 @@
 import { Module } from '@nestjs/common';
-import { GatewayMeetupMicroserviceModule } from './gateway-meetup-microservice/gateway-meetup-microservice.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { AllExceptionsFilter } from '@app/common';
-import { GatewayAuthMicroserviceModule } from './gateway-auth-microservice/gateway-auth-microservice.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { MeetupModule } from './modules/meetup/meetup.module';
 
 @Module({
-  imports: [GatewayMeetupMicroserviceModule, GatewayAuthMicroserviceModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: './apps/api-gateway/.env',
+      isGlobal: true,
+    }),
+    JwtModule.registerAsync({
+      global: true,
+      useFactory: async (configServie: ConfigService) => ({
+        secret: configServie.get<string>('JWT_ACCESS_SECRET'),
+        signOptions: {
+          expiresIn: configServie.get<string>('JWT_ACCESS_DURATION'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+
+    PassportModule,
+    AuthModule,
+    UserModule,
+    MeetupModule,
+  ],
   providers: [
     {
       provide: APP_FILTER,

@@ -1,19 +1,26 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth/auth.controller';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
 import { APP_FILTER } from '@nestjs/core';
 import { MicroserviceAllExceptionsFilter } from '@app/common';
-import { JwtModule } from './jwt/jwt.module';
+import { JwtModule } from './modules/jwt/jwt.module';
+import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, AuthModule, JwtModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: './apps/authorization-microservice/.env',
+      isGlobal: true,
+    }),
+    UserModule,
+    AuthModule,
+    JwtModule,
+  ],
   providers: [
     {
       provide: APP_FILTER,
       useClass: MicroserviceAllExceptionsFilter,
     },
   ],
-  controllers: [AuthController],
 })
 export class AuthorizationMicroserviceModule {}

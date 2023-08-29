@@ -1,11 +1,21 @@
 import { Module } from '@nestjs/common';
-import { TagModule } from './tag/tag.module';
-import { MeetupModule } from './meetup/meetup.module';
 import { APP_FILTER } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 import { MicroserviceAllExceptionsFilter } from '@app/common';
+import { TagModule } from './modules/tag/tag.module';
+import { MeetupModule } from './modules/meetup/meetup.module';
+import { DatabaseModule } from './modules/database/database.module';
 
 @Module({
-  imports: [TagModule, MeetupModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: './apps/meetup-microservice/.env',
+      isGlobal: true,
+    }),
+    DatabaseModule,
+    TagModule,
+    MeetupModule,
+  ],
   controllers: [],
   providers: [
     {

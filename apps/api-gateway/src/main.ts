@@ -1,15 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { ApiGatewayModule } from './api-gateway.module';
-import { config } from 'dotenv';
 import * as cookieParser from 'cookie-parser';
-import { APPLICATION } from './constants/constants';
-
-config();
+import { ApiGatewayModule } from './api-gateway.module';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule);
+
+  const configService = new ConfigService();
+  const port = configService.get<number>('PORT');
+
   app.use(cookieParser());
-  await app.listen(APPLICATION.PORT);
+  await app.listen(port);
 }
 
 bootstrap();

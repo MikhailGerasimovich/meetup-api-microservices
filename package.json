@@ -5,7 +5,7 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "scripts": {
+    "scripts": {
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
@@ -18,11 +18,17 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/meetup-api-microservices/test/jest-e2e.json",
-    "prisma:generate:auth": "npx prisma generate --schema .\\apps\\authorization-microservice\\prisma\\schema.prisma",
-    "prisma:generate:meetup": "npx prisma generate --schema .\\apps\\meetup-microservice\\prisma\\schema.prisma"
+    "migrate:auth": "dotenv -e ./apps/authorization-microservice/.env -- npx prisma migrate dev --schema=./apps/authorization-microservice/prisma/schema.prisma",
+    "migrate:meetup": "dotenv -e ./apps/meetup-microservice/.env -- npx prisma migrate dev --schema=./apps/meetup-microservice/prisma/schema.prisma",
+    "generate:auth": "dotenv -e ./apps/authorization-microservice/.env -- npx prisma generate --schema=./apps/authorization-microservice/prisma/schema.prisma",
+    "generate:meetup": "dotenv -e ./apps/meetup-microservice/.env -- npx prisma generate --schema=./apps/meetup-microservice/prisma/schema.prisma",
+    "seed:auth": "dotenv -e ./apps/meetup-microservice/.env -- ts-node ./apps/authorization-microservice/prisma/seed.ts",
+    "seed:meetup": "dotenv -e ./apps/meetup-microservice/.env -- ts-node ./apps/meetup-microservice/prisma/seed.ts",
+    "db": "npm run migrate:auth && npm run migrate:meetup && npm run generate:auth && npm run generate:meetup && npm run seed:auth && npm run seed:meetup"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/jwt": "^10.1.0",
     "@nestjs/microservices": "^10.1.3",
