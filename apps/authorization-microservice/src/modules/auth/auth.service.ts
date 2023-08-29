@@ -31,8 +31,6 @@ export class AuthService {
       password: hashPassword,
     });
 
-    console.log(registratedUser);
-
     const payload = { id: registratedUser.id, role: registratedUser.role };
 
     const accessToken = await this.jwtService.generateAccessJwt(payload);

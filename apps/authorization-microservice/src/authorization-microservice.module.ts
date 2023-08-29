@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       envFilePath: './apps/authorization-microservice/.env',
       isGlobal: true,
+      cache: true,
     }),
     UserModule,
     AuthModule,

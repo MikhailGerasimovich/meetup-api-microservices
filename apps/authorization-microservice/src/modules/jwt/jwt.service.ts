@@ -1,20 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { JwtPayloadDto } from '@app/common';
-import { JWT } from '../../common';
 import { JwtRepository } from './jwt.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtService {
   constructor(
     private readonly jwtRepository: JwtRepository,
     private readonly nestJwtService: NestJwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   public async generateAccessJwt(payload: JwtPayloadDto): Promise<string> {
+    console.log();
+
     const accessToken = await this.nestJwtService.signAsync(payload, {
-      secret: JWT.ACCESS_SECRET,
-      expiresIn: JWT.ACCESS_DURATION,
+      secret: this.configService.get('JWT_ACCESS_SECRET'),
+      expiresIn: this.configService.get('JWT_ACCESS_DURATION'),
     });
 
     return accessToken;
@@ -22,8 +25,8 @@ export class JwtService {
 
   public async generateRefreshJwt(payload: JwtPayloadDto): Promise<string> {
     const refreshToken = await this.nestJwtService.signAsync(payload, {
-      secret: JWT.REFRESH_SECRET,
-      expiresIn: JWT.REFRESH_DURATION,
+      secret: this.configService.get('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get('JWT_REFRESH_DURATION'),
     });
 
     return refreshToken;
@@ -32,8 +35,8 @@ export class JwtService {
   public async isValidRefreshJwt(jwt: string): Promise<boolean> {
     try {
       await this.nestJwtService.verifyAsync(jwt, {
-        secret: JWT.REFRESH_SECRET,
-        maxAge: JWT.REFRESH_DURATION,
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
+        maxAge: this.configService.get('JWT_REFRESH_DURATION'),
       });
     } catch {
       return false;
