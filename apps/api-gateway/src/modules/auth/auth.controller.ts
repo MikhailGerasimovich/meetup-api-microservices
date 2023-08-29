@@ -7,7 +7,7 @@ import {
   LocalAuthGuard,
   RefreshGuard,
   UserFromRequest,
-  setupAuthCookie,
+  setAuthCookie,
 } from '../../common';
 import { RegistrationUserSchema } from './schemas';
 import { AuthService } from './auth.service';
@@ -25,7 +25,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     const tokens = await this.authService.registration(createUserDto);
-    setupAuthCookie(res, tokens);
+    setAuthCookie(res, tokens);
     return;
   }
 
@@ -34,7 +34,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   public async login(@UserFromRequest() user: UserEntity, @Res({ passthrough: true }) res: Response): Promise<void> {
     const tokens = await this.authService.login(user);
-    setupAuthCookie(res, tokens);
+    setAuthCookie(res, tokens);
     return;
   }
 
@@ -48,7 +48,7 @@ export class AuthController {
   ): Promise<void> {
     const { refreshToken } = req?.cookies['auth-cookie'];
     await this.authService.logout(userPayload, refreshToken);
-    setupAuthCookie(res, null);
+    setAuthCookie(res, null);
     return;
   }
 
@@ -62,7 +62,7 @@ export class AuthController {
   ): Promise<void> {
     const { refreshToken } = req?.cookies['auth-cookie'];
     const tokens = await this.authService.refresh(userPayload, refreshToken);
-    setupAuthCookie(res, tokens);
+    setAuthCookie(res, tokens);
     return;
   }
 }

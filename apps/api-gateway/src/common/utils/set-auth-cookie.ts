@@ -1,5 +1,5 @@
 import { Response } from 'express';
 
-export function setupAuthCookie(res: Response, cookie: any): void {
+export function setAuthCookie(res: Response, cookie: any): void {
   res.cookie('auth-cookie', cookie, { httpOnly: true });
 }

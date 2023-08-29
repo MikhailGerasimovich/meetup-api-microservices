@@ -4,6 +4,7 @@ import { JwtPayloadDto, JwtType, METADATA } from '@app/common';
 import { AUTH_MICROSERVICE, sendMessage } from '../../common';
 import { CreateUserDto } from './dto';
 import { UserEntity } from './types';
+
 @Injectable()
 export class AuthService {
   constructor(@Inject(AUTH_MICROSERVICE.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}

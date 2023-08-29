@@ -10,6 +10,6 @@ export * from './guards/role.guard';
 
 export * from './pipes/joi-validation.pipe';
 
-export * from './utils/setup-auth-cookie';
+export * from './utils/set-auth-cookie';
 
 export * from './utils/send-message';
