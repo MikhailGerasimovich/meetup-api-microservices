@@ -3,8 +3,8 @@ CREATE TABLE "Meetups" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
-    "palce" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "place" TEXT NOT NULL,
     "organizerId" INTEGER NOT NULL,
 
     CONSTRAINT "Meetups_pkey" PRIMARY KEY ("id")

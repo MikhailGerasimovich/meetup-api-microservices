@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 import { MicroserviceAllExceptionsFilter } from '@app/common';
 import { TagModule } from './modules/tag/tag.module';
 import { MeetupModule } from './modules/meetup/meetup.module';
 import { DatabaseModule } from './modules/database/database.module';
-import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [

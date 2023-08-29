@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:957483@localhost:5432/authorization_microservice_db?schema=public"
+  url      = env("AUTH_DATABASE_URL")
 }
 
 enum Roles {
