@@ -59,21 +59,21 @@ export class MeetupService {
     return meetup;
   }
 
-  async update(id: number, updateTagDto: UpdateMeetupDto): Promise<MeetupType> {
+  async update(id: number, updateTagDto: UpdateMeetupDto, jwtPayload: JwtPayloadDto): Promise<MeetupType> {
     const updatedTag = await sendMessage<MeetupType>({
       client: this.client,
       metadata: METADATA.MP_UPDATE_MEETUP_BY_ID,
-      data: { id, updateTagDto },
+      data: { id, updateTagDto, jwtPayload },
     });
 
     return updatedTag;
   }
 
-  async deleteById(id: number): Promise<void> {
+  async deleteById(id: number, jwtPayload: JwtPayloadDto): Promise<void> {
     await sendMessage({
       client: this.client,
       metadata: METADATA.EP_DELETE_MEETUP_BY_ID,
-      data: { id },
+      data: { id, jwtPayload },
     });
   }
 }
