@@ -55,13 +55,18 @@ export class MeetupController {
   async update(
     @Payload('id', ParseIntPipe) id: number,
     @Payload('updateMeetupDto') updateMeetupDto: UpdateMeetupDto,
+    @Payload('jwtPayload') jwtPayload: JwtPayloadDto,
   ): Promise<MeetupType> {
-    const updatedMeetup = await this.meetupService.update(id, updateMeetupDto);
+    const updatedMeetup = await this.meetupService.update(id, updateMeetupDto, jwtPayload);
     return new MeetupType(updatedMeetup);
   }
 
   @MessagePattern(METADATA.EP_DELETE_MEETUP_BY_ID)
-  async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<void> {
-    await this.meetupService.deleteById(id);
+  async deleteById(
+    @Payload('id', ParseIntPipe) id: number,
+    @Payload('jwtPayload') jwtPayload: JwtPayloadDto,
+  ): Promise<string> {
+    await this.meetupService.deleteById(id, jwtPayload);
+    return 'sucess';
   }
 }

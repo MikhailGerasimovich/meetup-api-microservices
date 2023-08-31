@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { JwtPayloadDto, ReadAllResult } from '@app/common';
+import { JwtPayloadDto, ROLES, ReadAllResult } from '@app/common';
 import { MeetupRepository } from './meetup.repository';
 import { CreateMeetupDto, UpdateMeetupDto } from './dto';
 import { IReadAllMeetupOptions, MeetupEntity, MeetupCreationAttrs, MeetupUpdateAttrs } from './types';
@@ -62,10 +62,17 @@ export class MeetupService {
     return meetup;
   }
 
-  async update(id: number, updateMeetupDto: UpdateMeetupDto): Promise<MeetupEntity> {
+  async update(id: number, updateMeetupDto: UpdateMeetupDto, jwtPayload: JwtPayloadDto): Promise<MeetupEntity> {
     const existingMeetup = await this.meetupRepository.readById(id);
     if (!existingMeetup) {
       throw new RpcException({ message: `The specified meetup does not exist`, statusCode: HttpStatus.BAD_REQUEST });
+    }
+
+    if (jwtPayload.id != existingMeetup.organizerId) {
+      throw new RpcException({
+        message: 'You do not have permission to perform this action',
+        statusCode: HttpStatus.FORBIDDEN,
+      });
     }
 
     const tags = updateMeetupDto.tags ? await this._createTagsIfNotExist(updateMeetupDto.tags) : null;
@@ -76,17 +83,23 @@ export class MeetupService {
       date: updateMeetupDto.date || existingMeetup.date,
       place: updateMeetupDto.place || existingMeetup.place,
       tags: tags,
-      organizerId: 1, //test data
     };
 
     const updatedMeetup = await this.meetupRepository.update(id, meetupUpdateAttrs);
     return updatedMeetup;
   }
 
-  async deleteById(id: number): Promise<void> {
+  async deleteById(id: number, jwtPayload: JwtPayloadDto): Promise<void> {
     const existingMeetup = await this.meetupRepository.readById(id);
     if (!existingMeetup) {
       throw new RpcException({ message: `The specified meetup does not exist`, statusCode: HttpStatus.BAD_REQUEST });
+    }
+
+    if (jwtPayload.id != existingMeetup.organizerId || jwtPayload.role != ROLES.ADMIN) {
+      throw new RpcException({
+        message: 'You do not have permission to perform this action',
+        statusCode: HttpStatus.FORBIDDEN,
+      });
     }
 
     const tags = existingMeetup.tags.map((obj) => obj.tag);

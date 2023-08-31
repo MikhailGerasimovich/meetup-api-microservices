@@ -51,20 +51,20 @@ export class MeetupController {
     return createdMeetup;
   }
 
-  @Post('join/:meetupId')
+  @Post('join/:id')
   @HttpCode(HttpStatus.CREATED)
   public async joinToMeetup(
-    @Param('meetupId', ParseIntPipe) meetupId: number,
+    @Param('id', ParseIntPipe) meetupId: number,
     @UserFromRequest() member: JwtPayloadDto,
   ): Promise<MeetupType> {
     const meetup = await this.meetupService.joinToMeetup(meetupId, member);
     return meetup;
   }
 
-  @Post('leave/:meetupId')
+  @Post('leave/:id')
   @HttpCode(HttpStatus.CREATED)
   public async leaveFromMeetup(
-    @Param('meetupId', ParseIntPipe) meetupId: number,
+    @Param('id', ParseIntPipe) meetupId: number,
     @UserFromRequest() member: JwtPayloadDto,
   ): Promise<MeetupType> {
     const meetup = await this.meetupService.leaveFromMeetup(meetupId, member);
@@ -76,14 +76,15 @@ export class MeetupController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(UpdateMeetupSchema)) updateMeetupDto: UpdateMeetupDto,
+    @UserFromRequest() jwtPayload: JwtPayloadDto,
   ): Promise<MeetupType> {
-    const updatedMeetup = await this.meetupService.update(id, updateMeetupDto);
+    const updatedMeetup = await this.meetupService.update(id, updateMeetupDto, jwtPayload);
     return updatedMeetup;
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.meetupService.deleteById(id);
+  async deleteById(@Param('id', ParseIntPipe) id: number, @UserFromRequest() jwtPayload: JwtPayloadDto): Promise<void> {
+    await this.meetupService.deleteById(id, jwtPayload);
   }
 }
