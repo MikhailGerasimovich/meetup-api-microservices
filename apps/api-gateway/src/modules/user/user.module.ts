@@ -4,6 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AUTH_MICROSERVICE } from '../../common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
+import { AwsModule } from '../aws/aws.module';
+import { AwsOptions } from '../aws/types';
 
 @Module({
   imports: [
@@ -25,6 +27,17 @@ import { UserController } from './user.controller';
           inject: [ConfigService],
         },
       ],
+    }),
+
+    AwsModule.registerAsync({
+      useFactory: (configService: ConfigService): AwsOptions => ({
+        accessKeyId: configService.get<string>('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: configService.get<string>('AWS_SECRET_ACCESS_KEY'),
+        Bucket: configService.get<string>('AWS_BUCKET_NAME'),
+        debug: true,
+        route: configService.get<string>('AWS_ROUTE_NAME'),
+      }),
+      inject: [ConfigService],
     }),
   ],
   providers: [UserService],
