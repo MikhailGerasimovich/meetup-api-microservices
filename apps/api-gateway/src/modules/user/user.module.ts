@@ -34,7 +34,7 @@ import { AwsOptions } from '../aws/types';
         accessKeyId: configService.get<string>('AWS_ACCESS_KEY_ID'),
         secretAccessKey: configService.get<string>('AWS_SECRET_ACCESS_KEY'),
         Bucket: configService.get<string>('AWS_BUCKET_NAME'),
-        debug: true,
+        debug: false,
         route: configService.get<string>('AWS_ROUTE_NAME'),
       }),
       inject: [ConfigService],

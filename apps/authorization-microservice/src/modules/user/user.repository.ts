@@ -45,6 +45,7 @@ export class UserRepository {
         id: true,
         login: true,
         email: true,
+        avatarPhotoPaht: true,
       },
     });
     return user;
