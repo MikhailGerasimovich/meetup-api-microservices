@@ -45,7 +45,7 @@ export class UserRepository {
         id: true,
         login: true,
         email: true,
-        avatarPhotoPaht: true,
+        avatarFilename: true,
       },
     });
     return user;
@@ -91,6 +91,35 @@ export class UserRepository {
   async deleteById(id: number): Promise<void> {
     await this.prisma.users.delete({
       where: { id },
+    });
+  }
+
+  async uploadAvatar(id: number, filename: string): Promise<void> {
+    await this.prisma.users.update({
+      where: { id },
+      data: {
+        avatarFilename: filename,
+      },
+    });
+  }
+
+  async downloadAvatar(id: number): Promise<string> {
+    const user = await this.prisma.users.findUnique({
+      where: { id },
+      select: {
+        avatarFilename: true,
+      },
+    });
+
+    return user.avatarFilename;
+  }
+
+  async removeAvatar(id: number) {
+    await this.prisma.users.update({
+      where: { id },
+      data: {
+        avatarFilename: null,
+      },
     });
   }
 }

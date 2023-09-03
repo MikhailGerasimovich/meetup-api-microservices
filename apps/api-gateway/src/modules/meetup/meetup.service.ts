@@ -72,7 +72,7 @@ export class MeetupService {
   async deleteById(id: number, jwtPayload: JwtPayloadDto): Promise<void> {
     await sendMessage({
       client: this.client,
-      metadata: METADATA.EP_DELETE_MEETUP_BY_ID,
+      metadata: METADATA.MP_DELETE_MEETUP_BY_ID,
       data: { id, jwtPayload },
     });
   }

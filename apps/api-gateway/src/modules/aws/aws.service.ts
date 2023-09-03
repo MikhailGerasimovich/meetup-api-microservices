@@ -20,8 +20,14 @@ export class AwsService {
     this.route = this.awsOptions.route;
   }
 
-  async upload(file: Express.Multer.File): Promise<boolean> {
-    const awsResponse = await this.s3.Upload(file, this.route);
+  async upload(file: Express.Multer.File, filename: string): Promise<boolean> {
+    const awsResponse = await this.s3.Upload(
+      {
+        buffer: file.buffer,
+        name: filename,
+      },
+      this.route,
+    );
     return Boolean(awsResponse);
   }
 
@@ -30,7 +36,7 @@ export class AwsService {
     return file;
   }
 
-  async remove(folder: string, filename: string): Promise<any> {
+  async remove(folder: string, filename: string): Promise<boolean> {
     const isRemoved = await this.s3.Remove(`${folder}/${filename}`);
     if (typeof isRemoved == 'boolean') {
       return isRemoved;

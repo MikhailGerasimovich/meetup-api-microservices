@@ -13,19 +13,17 @@ import {
   UploadedFile,
   Res,
   Header,
-  ParseFilePipeBuilder,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtPayloadDto, ROLES, ReadAllResult } from '@app/common';
-import { JoiValidationPipe, JwtAuthGuard, Roles, RolesGuard, UserFromRequest } from '../../common';
+import { JoiValidationPipe, JwtAuthGuard, Roles, RolesGuard, UserFromRequest, ImageValidationPipe } from '../../common';
 import { ReadAllUserSchema } from './schemas';
 import { UserService } from './user.service';
 import { ReadAllUserDto } from './dto';
 import { UserType } from './types';
-import { ImageValidationPipe } from '../../common/pipes/image-validation.pipe';
 
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -68,10 +66,10 @@ export class UserController {
   @Header('Content-Type', 'image/jpeg')
   @HttpCode(HttpStatus.OK)
   async downloadAvatar(
-    @UserFromRequest() jwtPayload: JwtPayloadDto,
+    @Param('userId', ParseIntPipe) id: number,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    const image = await this.userService.downloadAvatar(jwtPayload);
+    const image = await this.userService.downloadAvatar(id);
     res.send(image.data.Body);
   }
 

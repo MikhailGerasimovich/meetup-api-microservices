@@ -1,6 +1,6 @@
 import { Controller, ParseIntPipe } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { METADATA, ReadAllResult } from '@app/common';
+import { AvatarDto, METADATA, ReadAllResult } from '@app/common';
 import { UserService } from './user.service';
 import { IReadAllUserOptions, UserType } from './types';
 
@@ -23,9 +23,30 @@ export class UserController {
     return new UserType(user);
   }
 
-  @MessagePattern(METADATA.EP_DELETE_USER_BY_ID)
+  @MessagePattern(METADATA.MP_DELETE_USER_BY_ID)
   async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<string> {
     await this.userService.deleteById(id);
     return 'success';
+  }
+
+  @MessagePattern(METADATA.MP_UPLOAD_AVATAR)
+  async uploadAvatar(
+    @Payload('id', ParseIntPipe) id: number,
+    @Payload('filename') filename: string,
+  ): Promise<AvatarDto> {
+    const avatarDto = await this.userService.uploadAvatar(id, filename);
+    return avatarDto;
+  }
+
+  @MessagePattern(METADATA.MP_DOWNLOAD_AVATAR)
+  async downloadAvatar(@Payload('id', ParseIntPipe) id: number): Promise<AvatarDto> {
+    const avatarDto = await this.userService.downloadAvatar(id);
+    return avatarDto;
+  }
+
+  @MessagePattern(METADATA.MP_REMOVE_AVATAR)
+  async removeAvatar(@Payload('id', ParseIntPipe) id: number) {
+    const avatarDto = await this.userService.removeAvatar(id);
+    return avatarDto;
   }
 }
