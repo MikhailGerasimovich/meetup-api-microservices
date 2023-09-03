@@ -61,7 +61,7 @@ export class MeetupController {
     return new MeetupType(updatedMeetup);
   }
 
-  @MessagePattern(METADATA.EP_DELETE_MEETUP_BY_ID)
+  @MessagePattern(METADATA.MP_DELETE_MEETUP_BY_ID)
   async deleteById(
     @Payload('id', ParseIntPipe) id: number,
     @Payload('jwtPayload') jwtPayload: JwtPayloadDto,

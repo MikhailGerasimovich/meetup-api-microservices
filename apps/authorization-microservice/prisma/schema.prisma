@@ -14,12 +14,13 @@ enum Roles {
 }
 
 model Users {
-  id       Int      @id @unique @default(autoincrement())
-  login    String   @unique
-  email    String   @unique
-  password String
-  role     Roles    @default(USER)
-  tokens   Tokens[]
+  id             Int      @id @unique @default(autoincrement())
+  login          String   @unique
+  email          String   @unique
+  password       String
+  avatarFilename String?
+  role           Roles    @default(USER)
+  tokens         Tokens[]
 }
 
 model Tokens {

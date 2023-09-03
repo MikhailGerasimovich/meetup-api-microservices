@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { ReadAllResult, ROLES } from '@app/common';
+import { AvatarDto, ReadAllResult, ROLES } from '@app/common';
 import { UserRepository } from './user.repository';
 import { IReadAllUserOptions, UserEntity, UserCreationAttrs } from './types';
 import { CreateUserDto } from './dto';
@@ -47,5 +47,42 @@ export class UserService {
 
     await this.jwtService.deleteAllUserJwt(id);
     await this.userRepository.deleteById(id);
+  }
+
+  async uploadAvatar(id: number, filename: string): Promise<AvatarDto> {
+    const user = await this.userRepository.readById(id);
+
+    const oldAvatarFilename = user.avatarFilename;
+    const avatarDto: AvatarDto = { avatarFilename: filename };
+    if (oldAvatarFilename) {
+      avatarDto.hasOldAvatar = true;
+      avatarDto.oldAvatarFilename = oldAvatarFilename;
+    }
+
+    await this.userRepository.uploadAvatar(id, filename);
+    return avatarDto;
+  }
+
+  async downloadAvatar(id: number): Promise<AvatarDto> {
+    const avatarFilename = await this.userRepository.downloadAvatar(id);
+    if (!avatarFilename) {
+      throw new RpcException({ message: `No avatars to download`, statusCode: HttpStatus.BAD_REQUEST });
+    }
+
+    const avatarDto: AvatarDto = { avatarFilename: avatarFilename };
+    return avatarDto;
+  }
+
+  async removeAvatar(id: number): Promise<AvatarDto> {
+    const user = await this.userRepository.readById(id);
+    const avatarFilename = user.avatarFilename;
+    if (!avatarFilename) {
+      throw new RpcException({ message: `No avatars to remove`, statusCode: HttpStatus.BAD_REQUEST });
+    }
+    await this.userRepository.removeAvatar(id);
+    const avatarDto: AvatarDto = {
+      avatarFilename: avatarFilename,
+    };
+    return avatarDto;
   }
 }

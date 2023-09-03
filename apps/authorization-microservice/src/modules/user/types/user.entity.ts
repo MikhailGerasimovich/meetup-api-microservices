@@ -5,5 +5,6 @@ export class UserEntity {
   login: string;
   email?: string;
   password?: string;
+  avatarFilename?: string;
   role?: ROLES;
 }
