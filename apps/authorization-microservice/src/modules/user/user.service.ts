@@ -18,24 +18,26 @@ export class UserService {
     return readAllUser;
   }
 
-  async readById(id: number): Promise<UserEntity> {
-    const user = await this.userRepository.readById(id);
+  async readById(id: number, selectFields?: string[]): Promise<UserEntity> {
+    const user = await this.userRepository.readById(id, selectFields);
     return user;
   }
 
-  async readByLogin(login: string, requiredFields?: string[]): Promise<UserEntity> {
-    const user = await this.userRepository.readByLogin(login, requiredFields);
+  async readByEmail(email: string, selectFields?: string[]): Promise<UserEntity> {
+    const user = await this.userRepository.readByEmail(email, selectFields);
     return user;
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async create(createUserDto: CreateUserDto, provider: string, selectFields?: string[]): Promise<UserEntity> {
     const userCreationAttrs: UserCreationAttrs = {
-      login: createUserDto.login,
+      username: createUserDto.username,
       email: createUserDto.email,
       password: createUserDto.password,
+      provider,
       role: ROLES.USER,
     };
-    const createdUser = await this.userRepository.create(userCreationAttrs);
+
+    const createdUser = await this.userRepository.create(userCreationAttrs, selectFields);
     return createdUser;
   }
 
@@ -50,7 +52,8 @@ export class UserService {
   }
 
   async uploadAvatar(id: number, filename: string): Promise<AvatarDto> {
-    const user = await this.userRepository.readById(id);
+    const selectFields = ['avatarFilename'];
+    const user = await this.userRepository.readById(id, selectFields);
 
     const oldAvatarFilename = user.avatarFilename;
     const avatarDto: AvatarDto = { avatarFilename: filename };
@@ -74,7 +77,8 @@ export class UserService {
   }
 
   async removeAvatar(id: number): Promise<AvatarDto> {
-    const user = await this.userRepository.readById(id);
+    const selectFields = ['avatarFilename'];
+    const user = await this.userRepository.readById(id, selectFields);
     const avatarFilename = user.avatarFilename;
     if (!avatarFilename) {
       throw new RpcException({ message: `No avatars to remove`, statusCode: HttpStatus.BAD_REQUEST });

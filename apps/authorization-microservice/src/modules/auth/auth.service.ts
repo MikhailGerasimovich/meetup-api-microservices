@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { compareSync, hash } from 'bcryptjs';
-import { JwtPayloadDto, JwtType } from '@app/common';
+import { JwtPayloadDto, JwtType, YandexUser } from '@app/common';
 import { JwtService } from '../jwt/jwt.service';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto';
@@ -14,68 +14,95 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async validateUser(login: string, password: string): Promise<JwtPayloadDto> {
-    const candidate = await this.userService.readByLogin(login, ['password', 'role']);
-
-    if (candidate && compareSync(password, candidate.password)) {
-      return { id: candidate.id, role: candidate.role };
+  async validateUser(supposedEmail: string, supposedPassword: string): Promise<JwtPayloadDto> {
+    const selectFields = ['password', 'role', 'provider'];
+    const candidate = await this.userService.readByEmail(supposedEmail, selectFields);
+    const { id, role, password, provider } = candidate;
+    if (candidate && provider == 'local' && compareSync(supposedPassword, password)) {
+      return { id, role };
     }
 
     throw new RpcException({ message: 'wrong login or password', statusCode: HttpStatus.BAD_REQUEST });
   }
 
-  public async registration(createUserDto: CreateUserDto): Promise<JwtType> {
-    const hashPassword = await hash(createUserDto.password, 10);
-    const registratedUser = await this.userService.create({
-      ...createUserDto,
-      password: hashPassword,
-    });
-
-    const payload = { id: registratedUser.id, role: registratedUser.role };
-
-    const accessToken = await this.jwtService.generateAccessJwt(payload);
-    const refreshToken = await this.jwtService.generateRefreshJwt(payload);
-
-    return { accessToken, refreshToken };
+  async registration(createUserDto: CreateUserDto): Promise<JwtType> {
+    const registratedUser = await this.createLocalUser(createUserDto);
+    const { id, role } = registratedUser;
+    const tokens = await this.loginUser(id, role);
+    return tokens;
   }
 
-  public async login(user: UserEntity): Promise<JwtType> {
-    const payload = { id: user.id, role: user.role };
-
-    const accessToken = await this.jwtService.generateAccessJwt(payload);
-    const refreshToken = await this.jwtService.generateRefreshJwt(payload);
-
-    await this.jwtService.saveJwt(user.id, refreshToken);
-
-    return { accessToken, refreshToken };
+  async localLogin(user: JwtPayloadDto): Promise<JwtType> {
+    const { id, role } = user;
+    const tokens = await this.loginUser(id, role);
+    return tokens;
   }
 
-  public async logout(userPayload: JwtPayloadDto, refreshToken: string): Promise<void> {
-    await this.jwtService.deleteJwt(userPayload.id, refreshToken);
+  async yandexLogin(yandexUser: YandexUser) {
+    const selectFields = ['role'];
+    const { email } = yandexUser;
+    let user = await this.userService.readByEmail(email, selectFields);
+    if (!user) {
+      user = await this.createYandexUser(yandexUser);
+    }
+
+    const { id, role } = user;
+    const tokens = await this.loginUser(id, role);
+    return tokens;
   }
 
-  public async refresh(userPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
-    const token = await this.jwtService.readJwt(userPayload.id, refreshToken);
+  async logout(jwtPayload: JwtPayloadDto, refreshToken: string): Promise<void> {
+    await this.jwtService.deleteJwt(jwtPayload.id, refreshToken);
+  }
 
+  async refresh(jwtPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
+    const { id, role } = jwtPayload;
+    const token = await this.jwtService.readJwt(id, refreshToken);
     if (!token) {
-      await this.jwtService.deleteAllUserJwt(userPayload.id);
+      await this.jwtService.deleteAllUserJwt(id);
       throw new RpcException({ message: 'Need to login', statusCode: HttpStatus.UNAUTHORIZED });
     }
 
     const isValidToken = await this.jwtService.isValidRefreshJwt(token);
     if (!isValidToken) {
-      await this.jwtService.deleteJwt(userPayload.id, refreshToken);
+      await this.jwtService.deleteJwt(id, refreshToken);
       throw new RpcException({ message: 'Need to login', statusCode: HttpStatus.UNAUTHORIZED });
     }
 
-    await this.jwtService.deleteJwt(userPayload.id, refreshToken);
+    await this.jwtService.deleteJwt(id, refreshToken);
+    const tokens = await this.loginUser(id, role);
+    return tokens;
+  }
 
-    const payload = { id: userPayload.id, role: userPayload.role };
-    const newAccessToken = await this.jwtService.generateAccessJwt(payload);
-    const newRefreshToken = await this.jwtService.generateRefreshJwt(payload);
+  private async loginUser(id: number, role: string): Promise<JwtType> {
+    const payload = { id, role };
+    const accessToken = await this.jwtService.generateAccessJwt(payload);
+    const refreshToken = await this.jwtService.generateRefreshJwt(payload);
+    await this.jwtService.saveJwt(id, refreshToken);
 
-    await this.jwtService.saveJwt(userPayload.id, newRefreshToken);
+    return { accessToken, refreshToken };
+  }
 
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+  private async createLocalUser(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const selectFields = ['role'];
+    const provider = 'local';
+    const hashPassword = await hash(createUserDto.password, 10);
+    const user = { ...createUserDto, password: hashPassword };
+    const registratedUser = await this.userService.create(user, provider, selectFields);
+    return registratedUser;
+  }
+
+  private async createYandexUser(yandexUser: YandexUser): Promise<UserEntity> {
+    const { username, email } = yandexUser;
+    const selectFields = ['role'];
+    const provider = 'yandex';
+    const user: CreateUserDto = {
+      username,
+      email,
+      password: null,
+    };
+
+    const registratedUser = await this.userService.create(user, provider, selectFields);
+    return registratedUser;
   }
 }

@@ -1,10 +1,11 @@
 import { ROLES } from '@app/common';
 
 export class UserEntity {
-  id: number;
-  login: string;
+  id?: number;
+  username?: string;
   email?: string;
   password?: string;
+  provider?: string;
   avatarFilename?: string;
   role?: ROLES;
 }

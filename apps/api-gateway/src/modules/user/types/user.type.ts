@@ -2,12 +2,12 @@ import { UserEntity } from './user.entity';
 
 export class UserType {
   id: number;
-  login: string;
+  username: string;
   email: string;
 
   constructor(user: UserEntity) {
     this.id = user?.id;
-    this.login = user?.login;
+    this.username = user?.username;
     this.email = user?.email;
   }
 }

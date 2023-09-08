@@ -1,4 +1,4 @@
 export class UserUpdateAttrs {
-  login?: string;
+  username?: string;
   email?: string;
 }

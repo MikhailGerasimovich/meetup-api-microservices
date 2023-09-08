@@ -20,8 +20,10 @@ import { AwsOptions } from '../aws/types';
               urls: [configService.get<string>('RMQ_URL_AUTH_MICROSERVICE')],
               queue: configService.get<string>('RMQ_QUEUE_AUTH_MICROSERVICE'),
               queueOptions: {
-                durable: false,
+                durable: true,
               },
+              noAck: false,
+              persistent: true,
             },
           }),
           inject: [ConfigService],

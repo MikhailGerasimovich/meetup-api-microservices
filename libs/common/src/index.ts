@@ -16,5 +16,6 @@ export * from './dto/avatar.dto';
 
 export * from './types/jwt.type';
 export * from './types/roles.enum';
+export * from './types/yandex-user.type';
 
 export * from './constants/rmq-metadata.constants';

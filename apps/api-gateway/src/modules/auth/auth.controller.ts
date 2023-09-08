@@ -1,5 +1,5 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { JwtPayloadDto } from '@app/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { JwtPayloadDto, YandexUser } from '@app/common';
 import { Request, Response } from 'express';
 import {
   JoiValidationPipe,
@@ -7,12 +7,13 @@ import {
   LocalAuthGuard,
   RefreshGuard,
   UserFromRequest,
+  YandexAuthGuard,
   setAuthCookie,
 } from '../../common';
-import { RegistrationUserSchema } from './schemas';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto';
 import { UserEntity } from './types';
+import { LocalRegistrationSchema, YandexLoginSchema } from './schemas';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
   @Post('registration')
   @HttpCode(HttpStatus.CREATED)
   public async registration(
-    @Body(new JoiValidationPipe(RegistrationUserSchema)) createUserDto: CreateUserDto,
+    @Body(new JoiValidationPipe(LocalRegistrationSchema)) createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     const tokens = await this.authService.registration(createUserDto);
@@ -30,12 +31,27 @@ export class AuthController {
   }
 
   @UseGuards(LocalAuthGuard)
-  @Post('login')
+  @Post('local/login')
   @HttpCode(HttpStatus.OK)
-  public async login(@UserFromRequest() user: UserEntity, @Res({ passthrough: true }) res: Response): Promise<void> {
-    const tokens = await this.authService.login(user);
+  public async localLogin(
+    @UserFromRequest() user: UserEntity,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    const tokens = await this.authService.localLogin(user);
     setAuthCookie(res, tokens);
     return;
+  }
+
+  @UseGuards(YandexAuthGuard)
+  @Get('yandex/login')
+  @HttpCode(HttpStatus.OK)
+  async yandexLoginCallback(
+    @UserFromRequest(new JoiValidationPipe(YandexLoginSchema)) yandexUser: YandexUser,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<string> {
+    const tokens = await this.authService.yandexLogin(yandexUser);
+    setAuthCookie(res, tokens);
+    return 'yandex user login';
   }
 
   @UseGuards(JwtAuthGuard)

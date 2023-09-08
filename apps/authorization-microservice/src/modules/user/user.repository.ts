@@ -11,10 +11,8 @@ export class UserRepository {
   async readAll(readAllOptions: IReadAllUserOptions): Promise<ReadAllResult<UserEntity>> {
     const page = readAllOptions?.pagination?.page || defaultPagination.page;
     const size = readAllOptions?.pagination?.size || defaultPagination.size;
-
     const column = readAllOptions?.sorting?.column ?? defaultSorting.column;
     const direction = readAllOptions?.sorting?.direction ?? defaultSorting.direction;
-
     const filters = getUserFilters(readAllOptions?.filters);
 
     const records = await this.prisma.users.findMany({
@@ -27,65 +25,55 @@ export class UserRepository {
 
       select: {
         id: true,
-        login: true,
+        username: true,
         email: true,
       },
     });
-
     const totalRecordsNumber = await this.prisma.users.count({ where: { ...filters.userFilters } });
-
     return { totalRecordsNumber, records };
   }
 
-  async readById(id: number): Promise<UserEntity> {
+  async readById(id: number, selectFields?: string[]): Promise<UserEntity> {
+    const toSelect = this.getSelectFields(selectFields);
     const user = await this.prisma.users.findUnique({
       where: { id },
-
       select: {
         id: true,
-        login: true,
-        email: true,
-        avatarFilename: true,
-      },
-    });
-    return user;
-  }
-
-  async readByLogin(login: string, requiredFields?: string[]): Promise<UserEntity> {
-    const toSelect = {};
-    requiredFields?.forEach((field) => (toSelect[field] = true));
-
-    const user = await this.prisma.users.findUnique({
-      where: { login },
-
-      select: {
-        id: true,
-        login: true,
-        email: true,
         ...toSelect,
       },
     });
     return user;
   }
 
-  async create(userCreationAttrs: UserCreationAttrs): Promise<UserEntity> {
+  async readByEmail(email: string, selectFields?: string[]): Promise<UserEntity> {
+    const toSelect = this.getSelectFields(selectFields);
+    const user = await this.prisma.users.findFirst({
+      where: { email: email },
+      select: {
+        id: true,
+        ...toSelect,
+      },
+    });
+    return user;
+  }
+
+  async create(userCreationAttrs: UserCreationAttrs, selectFields?: string[]): Promise<UserEntity> {
+    const toSelect = this.getSelectFields(selectFields);
     const createdUser = await this.prisma.users.create({
       data: {
-        login: userCreationAttrs.login,
+        username: userCreationAttrs.username,
         email: userCreationAttrs.email,
         password: userCreationAttrs.password,
+        provider: userCreationAttrs.provider,
         role: userCreationAttrs.role,
       },
 
       select: {
         id: true,
-        login: true,
-        email: true,
-        role: true,
+        ...toSelect,
       },
     });
-
-    return <UserEntity>createdUser;
+    return createdUser;
   }
 
   async deleteById(id: number): Promise<void> {
@@ -110,7 +98,6 @@ export class UserRepository {
         avatarFilename: true,
       },
     });
-
     return user.avatarFilename;
   }
 
@@ -121,5 +108,14 @@ export class UserRepository {
         avatarFilename: null,
       },
     });
+  }
+
+  private getSelectFields(selectFields: string[]) {
+    if (!selectFields) {
+      selectFields = ['username', 'email'];
+    }
+    const toSelect = {};
+    selectFields?.forEach((field) => (toSelect[field] = true));
+    return toSelect;
   }
 }
