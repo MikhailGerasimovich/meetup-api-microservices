@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { JwtPayloadDto, JwtType, METADATA } from '@app/common';
+import { JwtPayloadDto, JwtType, METADATA, YandexUser } from '@app/common';
 import { AUTH_MICROSERVICE, sendMessage } from '../../common';
 import { CreateUserDto } from './dto';
 import { UserEntity } from './types';
@@ -9,49 +9,58 @@ import { UserEntity } from './types';
 export class AuthService {
   constructor(@Inject(AUTH_MICROSERVICE.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}
 
-  public async registration(createUserDto: CreateUserDto): Promise<JwtType> {
+  async registration(createUserDto: CreateUserDto): Promise<JwtType> {
     const user = await sendMessage<JwtType>({
       client: this.client,
       metadata: METADATA.MP_REGISTRATION,
-      data: createUserDto,
+      data: { createUserDto },
     });
 
     return user;
   }
 
-  public async login(user: UserEntity): Promise<JwtType> {
+  async localLogin(user: UserEntity): Promise<JwtType> {
     const tokens = await sendMessage<JwtType>({
       client: this.client,
-      metadata: METADATA.MP_LOGIN,
-      data: user,
+      metadata: METADATA.MP_LOCAL_LOGIN,
+      data: { user },
     });
 
     return tokens;
   }
 
-  public async logout(userPayload: JwtPayloadDto, refreshToken: string): Promise<void> {
+  async yandexLogin(yandexUser: YandexUser): Promise<JwtType> {
+    const tokens = await sendMessage<JwtType>({
+      client: this.client,
+      metadata: METADATA.MP_YANDEX_LOGIN,
+      data: yandexUser,
+    });
+    return tokens;
+  }
+
+  async logout(jwtPayload: JwtPayloadDto, refreshToken: string): Promise<void> {
     await sendMessage({
       client: this.client,
       metadata: METADATA.MP_LOGOUT,
-      data: { userPayload, refreshToken },
+      data: { jwtPayload, refreshToken },
     });
   }
 
-  public async refresh(userPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
+  async refresh(jwtPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
     const tokens = await sendMessage<JwtType>({
       client: this.client,
       metadata: METADATA.MP_REFRESH,
-      data: { userPayload, refreshToken },
+      data: { jwtPayload, refreshToken },
     });
 
     return tokens;
   }
 
-  public async validateUser(login: string, password: string): Promise<UserEntity> {
-    const validate = await sendMessage<UserEntity>({
+  async validateUser(email: string, password: string): Promise<JwtPayloadDto> {
+    const validate = await sendMessage<JwtPayloadDto>({
       client: this.client,
       metadata: METADATA.MP_VALIDATE_USER,
-      data: { login, password },
+      data: { email, password },
     });
 
     return validate;

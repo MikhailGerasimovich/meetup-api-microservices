@@ -1,1 +1,2 @@
-export * from './regiastration-user.schema';
+export * from './local-regiastration.schema';
+export * from './yandex-login.schema';

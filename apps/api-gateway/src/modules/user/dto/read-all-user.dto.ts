@@ -1,6 +1,6 @@
 import { BaseReadAllDto } from '@app/common';
 
 export class ReadAllUserDto extends BaseReadAllDto {
-  login?: string;
+  username?: string;
   email?: string;
 }

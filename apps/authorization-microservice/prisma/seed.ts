@@ -7,15 +7,17 @@ async function main() {
   const users = await prisma.users.createMany({
     data: [
       {
-        login: 'admin',
+        username: 'admin',
         password: '$2a$10$Gmgzb05mYzuZjljIZPbA.OsVdML7OI/y80hUF.uB755VEJGzS6MF2', //password_admin
         email: 'admin@mail.ru',
+        provider: 'local',
         role: 'ADMIN',
       },
       {
-        login: 'user',
+        username: 'user',
         password: '$2a$10$ZSrtVPKSTu3YmIHpr4HlM..hGgFQxuPelBKgIvGDX1p1z5EgtEn2a', //password_user
         email: 'user@mail.ru',
+        provider: 'local',
         role: 'USER',
       },
     ],

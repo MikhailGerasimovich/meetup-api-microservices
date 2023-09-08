@@ -2,7 +2,7 @@ import { IPaginationOptions, ISortingOptions } from '@app/common';
 
 export interface IReadAllUserOptions {
   filters?: {
-    login?: string;
+    username?: string;
     email?: string;
   };
   pagination?: IPaginationOptions;

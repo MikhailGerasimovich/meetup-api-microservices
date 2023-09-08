@@ -18,7 +18,7 @@ import { MeetupController } from './meetup.controller';
               urls: [configService.get<string>('RMQ_URL_MEETUP_MICROSERVICE')],
               queue: configService.get<string>('RMQ_QUEUE_MEETUP_MICROSERVICE'),
               queueOptions: {
-                durable: false,
+                durable: true,
               },
             },
           }),

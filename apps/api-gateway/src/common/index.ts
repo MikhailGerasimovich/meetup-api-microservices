@@ -7,6 +7,7 @@ export * from './guards/jwt.guard';
 export * from './guards/local.guard';
 export * from './guards/refresh.guard';
 export * from './guards/role.guard';
+export * from './guards/yandex.guard';
 
 export * from './pipes/joi-validation.pipe';
 export * from './pipes/image-validation.pipe';

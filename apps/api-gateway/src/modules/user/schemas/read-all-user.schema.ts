@@ -3,7 +3,7 @@ import { PaginationDto, SortingDto } from '@app/common';
 import { ReadAllUserDto } from '../dto';
 
 export const ReadAllUserSchema = Joi.object<ReadAllUserDto>({
-  login: Joi.string().optional(),
+  username: Joi.string().optional(),
   email: Joi.string().optional(),
 
   pagination: Joi.object<PaginationDto>({

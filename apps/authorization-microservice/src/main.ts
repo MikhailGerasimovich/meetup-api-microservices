@@ -11,8 +11,10 @@ async function bootstrap() {
     options: {
       urls: [configService.get<string>('RMQ_URL_AUTH_MICROSERVICE')],
       queue: configService.get<string>('RMQ_QUEUE_AUTH_MICROSERVICE'),
+      noAck: false,
+      persistent: true,
       queueOptions: {
-        durable: false,
+        durable: true,
       },
     },
   });

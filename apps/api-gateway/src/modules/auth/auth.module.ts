@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AUTH_MICROSERVICE } from '../../common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { JwtStrategy, LocalStrategy, RefreshStrategy } from './strategies';
+import { JwtStrategy, LocalStrategy, RefreshStrategy, YandexStrategy } from './strategies';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { JwtStrategy, LocalStrategy, RefreshStrategy } from './strategies';
               urls: [configService.get<string>('RMQ_URL_AUTH_MICROSERVICE')],
               queue: configService.get<string>('RMQ_QUEUE_AUTH_MICROSERVICE'),
               queueOptions: {
-                durable: false,
+                durable: true,
               },
             },
           }),
@@ -28,7 +28,7 @@ import { JwtStrategy, LocalStrategy, RefreshStrategy } from './strategies';
       ],
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshStrategy, YandexStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })
