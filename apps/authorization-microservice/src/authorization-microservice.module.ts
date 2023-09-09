@@ -6,17 +6,14 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 
+const DefineConfigModule = ConfigModule.forRoot({
+  envFilePath: './apps/authorization-microservice/.env',
+  isGlobal: true,
+  cache: true,
+});
+
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      envFilePath: './apps/authorization-microservice/.env',
-      isGlobal: true,
-      cache: true,
-    }),
-    UserModule,
-    AuthModule,
-    JwtModule,
-  ],
+  imports: [DefineConfigModule, UserModule, AuthModule, JwtModule],
   providers: [
     {
       provide: APP_FILTER,

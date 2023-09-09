@@ -1,7 +1,7 @@
-export const AUTH_MICROSERVICE = {
+export const AUTH = {
   RMQ_CLIENT_NAME: 'GATEWAY_AUTH_SERVICE',
 };
 
-export const MEETUP_MICROSERVICE = {
+export const MEETUP = {
   RMQ_CLIENT_NAME: 'GATEWAY_MEETUP_SERVICE',
 };

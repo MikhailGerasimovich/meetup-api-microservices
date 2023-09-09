@@ -14,12 +14,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(supposedEmail: string, supposedPassword: string): Promise<JwtPayloadDto> {
+  async validateUser(supposedEmail: string, password: string): Promise<JwtPayloadDto> {
     const selectFields = ['password', 'role', 'provider'];
     const candidate = await this.userService.readByEmail(supposedEmail, selectFields);
-    const { id, role, password, provider } = candidate;
-    if (candidate && provider == 'local' && compareSync(supposedPassword, password)) {
-      return { id, role };
+    if (candidate && candidate.provider == 'local' && compareSync(password, candidate.password)) {
+      return { id: candidate.id, role: candidate.role };
     }
 
     throw new RpcException({ message: 'wrong login or password', statusCode: HttpStatus.BAD_REQUEST });
