@@ -5,6 +5,7 @@ import { UserRepository } from './user.repository';
 import { IReadAllUserOptions, UserEntity, UserCreationAttrs } from './types';
 import { CreateUserDto } from './dto';
 import { JwtService } from '../jwt/jwt.service';
+import { TransactionClient } from '../../common';
 
 @Injectable()
 export class UserService {
@@ -18,17 +19,22 @@ export class UserService {
     return readAllUser;
   }
 
-  async readById(id: number, selectFields?: string[]): Promise<UserEntity> {
-    const user = await this.userRepository.readById(id, selectFields);
+  async readById(id: number, selectFields?: string[], transaction?: TransactionClient): Promise<UserEntity> {
+    const user = await this.userRepository.readById(id, selectFields, transaction);
     return user;
   }
 
-  async readByEmail(email: string, selectFields?: string[]): Promise<UserEntity> {
-    const user = await this.userRepository.readByEmail(email, selectFields);
+  async readByEmail(email: string, selectFields?: string[], transaction?: TransactionClient): Promise<UserEntity> {
+    const user = await this.userRepository.readByEmail(email, selectFields, transaction);
     return user;
   }
 
-  async create(createUserDto: CreateUserDto, provider: string, selectFields?: string[]): Promise<UserEntity> {
+  async create(
+    createUserDto: CreateUserDto,
+    provider: string,
+    selectFields?: string[],
+    transaction?: TransactionClient,
+  ): Promise<UserEntity> {
     const userCreationAttrs: UserCreationAttrs = {
       username: createUserDto.username,
       email: createUserDto.email,
@@ -37,18 +43,18 @@ export class UserService {
       role: ROLES.USER,
     };
 
-    const createdUser = await this.userRepository.create(userCreationAttrs, selectFields);
+    const createdUser = await this.userRepository.create(userCreationAttrs, selectFields, transaction);
     return createdUser;
   }
 
-  async deleteById(id: number): Promise<void> {
-    const existingUser = await this.userRepository.readById(id);
+  async deleteById(id: number, selectFields?: string[], transaction?: TransactionClient): Promise<void> {
+    const existingUser = await this.userRepository.readById(id, selectFields, transaction);
     if (!existingUser) {
       throw new RpcException({ message: `The specified user does not exist`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
-    await this.jwtService.deleteAllUserJwt(id);
-    await this.userRepository.deleteById(id);
+    await this.jwtService.deleteAllUserJwt(id, transaction);
+    await this.userRepository.deleteById(id, transaction);
   }
 
   async uploadAvatar(id: number, filename: string): Promise<AvatarDto> {

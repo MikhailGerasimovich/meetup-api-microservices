@@ -9,16 +9,14 @@ import { TransactionClient } from '../../common';
 export class MeetupRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async readAll(readAllOptions: IReadAllMeetupOptions, transaction?: TransactionClient): Promise<ReadAllResult<MeetupEntity>> {
-    const executer = transaction ? transaction : this.prisma;
-
+  async readAll(readAllOptions: IReadAllMeetupOptions): Promise<ReadAllResult<MeetupEntity>> {
     const page = readAllOptions?.pagination?.page || defaultPagination.page;
     const size = readAllOptions?.pagination?.size || defaultPagination.size;
     const column = readAllOptions?.sorting?.column ?? defaultSorting.column;
     const direction = readAllOptions?.sorting?.direction ?? defaultSorting.direction;
     const filters = getMeetupFilters(readAllOptions.filters);
 
-    const records = await executer.meetups.findMany({
+    const records = await this.prisma.meetups.findMany({
       where: { ...filters.meetupFilters, ...filters.tagFilters },
       skip: offset(page, size),
       take: Number(size),
@@ -35,7 +33,7 @@ export class MeetupRepository {
       },
     });
 
-    const totalRecordsNumber = await executer.meetups.count({
+    const totalRecordsNumber = await this.prisma.meetups.count({
       where: { ...filters.meetupFilters, ...filters.tagFilters },
     });
 

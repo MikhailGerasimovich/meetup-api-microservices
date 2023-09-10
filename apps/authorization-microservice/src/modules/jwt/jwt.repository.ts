@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
+import { TransactionClient } from '../../common';
 
 @Injectable()
 export class JwtRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async readJwt(userId: number, refreshToken: string): Promise<string | undefined> {
-    const token = await this.prisma.tokens.findFirst({
+  async readJwt(userId: number, refreshToken: string, transaction?: TransactionClient): Promise<string | undefined> {
+    const executer = transaction ? transaction : this.prisma;
+    const token = await executer.tokens.findFirst({
       where: {
         userId,
         refreshToken,
@@ -19,8 +21,9 @@ export class JwtRepository {
     return token?.refreshToken;
   }
 
-  async saveJwt(userId: number, refreshToken: string): Promise<void> {
-    await this.prisma.tokens.create({
+  async saveJwt(userId: number, refreshToken: string, transaction?: TransactionClient): Promise<void> {
+    const executer = transaction ? transaction : this.prisma;
+    await executer.tokens.create({
       data: {
         userId,
         refreshToken,
@@ -28,8 +31,9 @@ export class JwtRepository {
     });
   }
 
-  async deleteJwt(userId: number, refreshToken: string): Promise<void> {
-    await this.prisma.tokens.deleteMany({
+  async deleteJwt(userId: number, refreshToken: string, transaction?: TransactionClient): Promise<void> {
+    const executer = transaction ? transaction : this.prisma;
+    await executer.tokens.deleteMany({
       where: {
         userId,
         refreshToken,
@@ -37,8 +41,9 @@ export class JwtRepository {
     });
   }
 
-  async deleteAllUserJwt(userId: number): Promise<void> {
-    await this.prisma.tokens.deleteMany({
+  async deleteAllUserJwt(userId: number, transaction?: TransactionClient): Promise<void> {
+    const executer = transaction ? transaction : this.prisma;
+    await executer.tokens.deleteMany({
       where: { userId },
     });
   }

@@ -18,11 +18,8 @@ export class MeetupService {
   ) {}
 
   async readAll(readAllOptions: IReadAllMeetupOptions): Promise<ReadAllResult<MeetupEntity>> {
-    const transactionResult = await this.prisma.$transaction(async (transaction: TransactionClient) => {
-      const readAllMeetups = await this.meetupRepository.readAll(readAllOptions, transaction);
-      return readAllMeetups;
-    });
-    return transactionResult;
+    const readAllMeetups = await this.meetupRepository.readAll(readAllOptions);
+    return readAllMeetups;
   }
 
   async readById(id: number): Promise<MeetupEntity> {
