@@ -6,16 +6,13 @@ import { TagModule } from './modules/tag/tag.module';
 import { MeetupModule } from './modules/meetup/meetup.module';
 import { DatabaseModule } from './modules/database/database.module';
 
+const DefineConfigModule = ConfigModule.forRoot({
+  envFilePath: './apps/meetup-microservice/.env',
+  isGlobal: true,
+});
+
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      envFilePath: './apps/meetup-microservice/.env',
-      isGlobal: true,
-    }),
-    DatabaseModule,
-    TagModule,
-    MeetupModule,
-  ],
+  imports: [DefineConfigModule, DatabaseModule, TagModule, MeetupModule],
   controllers: [],
   providers: [
     {

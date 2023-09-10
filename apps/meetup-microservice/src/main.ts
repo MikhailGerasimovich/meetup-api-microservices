@@ -14,8 +14,10 @@ async function bootstrap() {
     options: {
       urls: [configService.get<string>('RMQ_URL_MEETUP_MICROSERVICE')],
       queue: configService.get<string>('RMQ_QUEUE_MEETUP_MICROSERVICE'),
+      noAck: true,
+      persistent: true,
       queueOptions: {
-        durable: false,
+        durable: true,
       },
     },
   });
