@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtPayloadDto, METADATA, ReadAllResult } from '@app/common';
-import { MEETUP_MICROSERVICE, sendMessage } from '../../common';
+import { MEETUP, sendMessage } from '../../common';
 import { IReadAllMeetupOptions, MeetupType } from './types';
 import { CreateMeetupDto, UpdateMeetupDto } from './dto';
 
 @Injectable()
 export class MeetupService {
-  constructor(@Inject(MEETUP_MICROSERVICE.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}
+  constructor(@Inject(MEETUP.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}
 
   async readAll(readAllMeetupOptions: IReadAllMeetupOptions): Promise<ReadAllResult<MeetupType>> {
     const meetups = await sendMessage<ReadAllResult<MeetupType>>({

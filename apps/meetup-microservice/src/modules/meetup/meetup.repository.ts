@@ -3,6 +3,7 @@ import { ReadAllResult, defaultPagination, defaultSorting, offset } from '@app/c
 import { PrismaService } from '../database/prisma.service';
 import { IReadAllMeetupOptions, MeetupEntity, MeetupCreationAttrs, MeetupUpdateAttrs } from './types';
 import { getMeetupFilters } from './filters';
+import { TransactionClient } from '../../common';
 
 @Injectable()
 export class MeetupRepository {
@@ -11,10 +12,8 @@ export class MeetupRepository {
   async readAll(readAllOptions: IReadAllMeetupOptions): Promise<ReadAllResult<MeetupEntity>> {
     const page = readAllOptions?.pagination?.page || defaultPagination.page;
     const size = readAllOptions?.pagination?.size || defaultPagination.size;
-
     const column = readAllOptions?.sorting?.column ?? defaultSorting.column;
     const direction = readAllOptions?.sorting?.direction ?? defaultSorting.direction;
-
     const filters = getMeetupFilters(readAllOptions.filters);
 
     const records = await this.prisma.meetups.findMany({
@@ -41,8 +40,9 @@ export class MeetupRepository {
     return { totalRecordsNumber, records };
   }
 
-  async readById(id: number): Promise<MeetupEntity> {
-    const meetup = await this.prisma.meetups.findUnique({
+  async readById(id: number, transaction?: TransactionClient): Promise<MeetupEntity> {
+    const executer = transaction ? transaction : this.prisma;
+    const meetup = await executer.meetups.findUnique({
       where: { id },
       include: {
         tags: {
@@ -55,8 +55,9 @@ export class MeetupRepository {
     return meetup;
   }
 
-  async create(meetupCreationAttrs: MeetupCreationAttrs): Promise<MeetupEntity> {
-    const createdMeetup = await this.prisma.meetups.create({
+  async create(meetupCreationAttrs: MeetupCreationAttrs, transaction?: TransactionClient): Promise<MeetupEntity> {
+    const executer = transaction ? transaction : this.prisma;
+    const createdMeetup = await executer.meetups.create({
       data: {
         title: meetupCreationAttrs.title,
         description: meetupCreationAttrs.description,
@@ -81,8 +82,9 @@ export class MeetupRepository {
     return createdMeetup;
   }
 
-  async joinToMeetup(meetupId: number, memberId: number): Promise<MeetupEntity> {
-    const meetup = await this.prisma.meetups.update({
+  async joinToMeetup(meetupId: number, memberId: number, transaction?: TransactionClient): Promise<MeetupEntity> {
+    const executer = transaction ? transaction : this.prisma;
+    const meetup = await executer.meetups.update({
       where: { id: meetupId },
       data: {
         members: {
@@ -96,8 +98,9 @@ export class MeetupRepository {
     return meetup;
   }
 
-  async leaveFromMeetup(meetupId: number, memberId: number): Promise<MeetupEntity> {
-    const meetup = await this.prisma.meetups.update({
+  async leaveFromMeetup(meetupId: number, memberId: number, transaction?: TransactionClient): Promise<MeetupEntity> {
+    const executer = transaction ? transaction : this.prisma;
+    const meetup = await executer.meetups.update({
       where: { id: meetupId },
       data: {
         members: {
@@ -111,8 +114,9 @@ export class MeetupRepository {
     return meetup;
   }
 
-  async isJoined(meetupId: number, memberId: number): Promise<boolean> {
-    const meetups = await this.prisma.members.findMany({
+  async isJoined(meetupId: number, memberId: number, transaction?: TransactionClient): Promise<boolean> {
+    const executer = transaction ? transaction : this.prisma;
+    const meetups = await executer.members.findMany({
       where: {
         meetupId: meetupId,
         userId: memberId,
@@ -122,7 +126,8 @@ export class MeetupRepository {
     return meetups.length !== 0;
   }
 
-  async update(id: number, meetupUpdateAttrs: MeetupUpdateAttrs): Promise<MeetupEntity> {
+  async update(id: number, meetupUpdateAttrs: MeetupUpdateAttrs, transaction?: TransactionClient): Promise<MeetupEntity> {
+    const executer = transaction ? transaction : this.prisma;
     const data: any = {
       title: meetupUpdateAttrs.title,
       description: String(meetupUpdateAttrs.description),
@@ -138,7 +143,7 @@ export class MeetupRepository {
       };
     }
 
-    const updatedMeetup = await this.prisma.meetups.update({
+    const updatedMeetup = await executer.meetups.update({
       where: { id },
       data: data,
       include: {
@@ -152,8 +157,9 @@ export class MeetupRepository {
     return updatedMeetup;
   }
 
-  async deleteById(id: number): Promise<void> {
-    await this.prisma.meetups.update({
+  async deleteById(id: number, transaction?: TransactionClient): Promise<void> {
+    const executer = transaction ? transaction : this.prisma;
+    await executer.meetups.update({
       where: { id: id },
       data: {
         tags: {
@@ -162,7 +168,7 @@ export class MeetupRepository {
       },
     });
 
-    await this.prisma.meetups.delete({
+    await executer.meetups.delete({
       where: { id: id },
     });
   }

@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtPayloadDto, JwtType, METADATA, YandexUser } from '@app/common';
-import { AUTH_MICROSERVICE, sendMessage } from '../../common';
+import { AUTH, sendMessage } from '../../common';
 import { CreateUserDto } from './dto';
 import { UserEntity } from './types';
 
 @Injectable()
 export class AuthService {
-  constructor(@Inject(AUTH_MICROSERVICE.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}
+  constructor(@Inject(AUTH.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}
 
   async registration(createUserDto: CreateUserDto): Promise<JwtType> {
     const user = await sendMessage<JwtType>({

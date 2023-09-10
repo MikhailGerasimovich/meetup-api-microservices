@@ -5,14 +5,14 @@ import { DownloadedFile } from 'easy-yandex-s3/types/EasyYandexS3';
 import { v4 as uuidv4 } from 'uuid';
 import { extname } from 'path';
 import { AvatarDto, JwtPayloadDto, METADATA, ReadAllResult } from '@app/common';
-import { AUTH_MICROSERVICE, sendMessage } from '../../common';
+import { AUTH, sendMessage } from '../../common';
 import { IReadAllUserOptions, UserType } from './types';
 import { AwsService } from '../aws/aws.service';
 
 @Injectable()
 export class UserService {
   constructor(
-    @Inject(AUTH_MICROSERVICE.RMQ_CLIENT_NAME) private readonly client: ClientProxy,
+    @Inject(AUTH.RMQ_CLIENT_NAME) private readonly client: ClientProxy,
     private readonly awsService: AwsService,
     private readonly configService: ConfigService,
   ) {}

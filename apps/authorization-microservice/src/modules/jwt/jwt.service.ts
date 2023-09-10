@@ -3,6 +3,7 @@ import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { JwtPayloadDto } from '@app/common';
 import { JwtRepository } from './jwt.repository';
 import { ConfigService } from '@nestjs/config';
+import { TransactionClient } from '../../common';
 
 @Injectable()
 export class JwtService {
@@ -13,8 +14,6 @@ export class JwtService {
   ) {}
 
   public async generateAccessJwt(payload: JwtPayloadDto): Promise<string> {
-    console.log();
-
     const accessToken = await this.nestJwtService.signAsync(payload, {
       secret: this.configService.get('JWT_ACCESS_SECRET'),
       expiresIn: this.configService.get('JWT_ACCESS_DURATION'),
@@ -44,20 +43,20 @@ export class JwtService {
     return true;
   }
 
-  public async readJwt(userId: number, refreshToken: string): Promise<string | undefined> {
-    const jwt = await this.jwtRepository.readJwt(userId, refreshToken);
+  public async readJwt(userId: number, refreshToken: string, transaction?: TransactionClient): Promise<string | undefined> {
+    const jwt = await this.jwtRepository.readJwt(userId, refreshToken, transaction);
     return jwt;
   }
 
-  public async saveJwt(userId: number, refreshToken: string): Promise<void> {
-    await this.jwtRepository.saveJwt(userId, refreshToken);
+  public async saveJwt(userId: number, refreshToken: string, transaction?: TransactionClient): Promise<void> {
+    await this.jwtRepository.saveJwt(userId, refreshToken, transaction);
   }
 
-  public async deleteJwt(userId: number, refreshToken: string): Promise<void> {
-    await this.jwtRepository.deleteJwt(userId, refreshToken);
+  public async deleteJwt(userId: number, refreshToken: string, transaction?: TransactionClient): Promise<void> {
+    await this.jwtRepository.deleteJwt(userId, refreshToken, transaction);
   }
 
-  public async deleteAllUserJwt(userId: number): Promise<void> {
-    await this.jwtRepository.deleteAllUserJwt(userId);
+  public async deleteAllUserJwt(userId: number, transaction?: TransactionClient): Promise<void> {
+    await this.jwtRepository.deleteAllUserJwt(userId, transaction);
   }
 }

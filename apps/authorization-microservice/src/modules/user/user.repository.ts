@@ -3,6 +3,7 @@ import { ReadAllResult, defaultPagination, defaultSorting, offset } from '@app/c
 import { PrismaService } from '../../database/prisma.service';
 import { getUserFilters } from './filters/read-all-user.filter';
 import { IReadAllUserOptions, UserEntity, UserCreationAttrs } from './types';
+import { TransactionClient } from '../../common';
 
 @Injectable()
 export class UserRepository {
@@ -33,9 +34,10 @@ export class UserRepository {
     return { totalRecordsNumber, records };
   }
 
-  async readById(id: number, selectFields?: string[]): Promise<UserEntity> {
+  async readById(id: number, selectFields?: string[], transaction?: TransactionClient): Promise<UserEntity> {
+    const executer = transaction ? transaction : this.prisma;
     const toSelect = this.getSelectFields(selectFields);
-    const user = await this.prisma.users.findUnique({
+    const user = await executer.users.findUnique({
       where: { id },
       select: {
         id: true,
@@ -45,9 +47,10 @@ export class UserRepository {
     return user;
   }
 
-  async readByEmail(email: string, selectFields?: string[]): Promise<UserEntity> {
+  async readByEmail(email: string, selectFields?: string[], transaction?: TransactionClient): Promise<UserEntity> {
+    const executer = transaction ? transaction : this.prisma;
     const toSelect = this.getSelectFields(selectFields);
-    const user = await this.prisma.users.findFirst({
+    const user = await executer.users.findFirst({
       where: { email: email },
       select: {
         id: true,
@@ -57,9 +60,14 @@ export class UserRepository {
     return user;
   }
 
-  async create(userCreationAttrs: UserCreationAttrs, selectFields?: string[]): Promise<UserEntity> {
+  async create(
+    userCreationAttrs: UserCreationAttrs,
+    selectFields?: string[],
+    transaction?: TransactionClient,
+  ): Promise<UserEntity> {
+    const executer = transaction ? transaction : this.prisma;
     const toSelect = this.getSelectFields(selectFields);
-    const createdUser = await this.prisma.users.create({
+    const createdUser = await executer.users.create({
       data: {
         username: userCreationAttrs.username,
         email: userCreationAttrs.email,
@@ -76,14 +84,16 @@ export class UserRepository {
     return createdUser;
   }
 
-  async deleteById(id: number): Promise<void> {
-    await this.prisma.users.delete({
+  async deleteById(id: number, transaction?: TransactionClient): Promise<void> {
+    const executer = transaction ? transaction : this.prisma;
+    await executer.users.delete({
       where: { id },
     });
   }
 
-  async uploadAvatar(id: number, filename: string): Promise<void> {
-    await this.prisma.users.update({
+  async uploadAvatar(id: number, filename: string, transaction?: TransactionClient): Promise<void> {
+    const executer = transaction ? transaction : this.prisma;
+    await executer.users.update({
       where: { id },
       data: {
         avatarFilename: filename,
@@ -91,8 +101,9 @@ export class UserRepository {
     });
   }
 
-  async downloadAvatar(id: number): Promise<string> {
-    const user = await this.prisma.users.findUnique({
+  async downloadAvatar(id: number, transaction?: TransactionClient): Promise<string> {
+    const executer = transaction ? transaction : this.prisma;
+    const user = await executer.users.findUnique({
       where: { id },
       select: {
         avatarFilename: true,
@@ -101,8 +112,9 @@ export class UserRepository {
     return user.avatarFilename;
   }
 
-  async removeAvatar(id: number) {
-    await this.prisma.users.update({
+  async removeAvatar(id: number, transaction?: TransactionClient) {
+    const executer = transaction ? transaction : this.prisma;
+    await executer.users.update({
       where: { id },
       data: {
         avatarFilename: null,
@@ -111,7 +123,7 @@ export class UserRepository {
   }
 
   private getSelectFields(selectFields: string[]) {
-    if (!selectFields) {
+    if (!selectFields || selectFields.length == 0) {
       selectFields = ['username', 'email'];
     }
     const toSelect = {};
