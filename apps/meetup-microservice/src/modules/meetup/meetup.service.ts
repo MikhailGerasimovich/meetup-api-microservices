@@ -8,6 +8,8 @@ import { PrismaService } from '../database/prisma.service';
 import { TagService } from '../tag/tag.service';
 import { TagEntity } from '../tag/types';
 import { TransactionClient } from '../../common';
+import { MeetupSearchService } from '../search/meetup-search.service';
+import { MeetupSearchResult } from '../search/types';
 
 @Injectable()
 export class MeetupService {
@@ -15,6 +17,7 @@ export class MeetupService {
     private readonly meetupRepository: MeetupRepository,
     private readonly tagService: TagService,
     private readonly prisma: PrismaService,
+    private readonly meetupSearch: MeetupSearchService,
   ) {}
 
   async readAll(readAllOptions: IReadAllMeetupOptions): Promise<ReadAllResult<MeetupEntity>> {
@@ -25,6 +28,11 @@ export class MeetupService {
   async readById(id: number): Promise<MeetupEntity> {
     const meetup = await this.meetupRepository.readById(id);
     return meetup;
+  }
+
+  async search(searchText: string): Promise<MeetupSearchResult> {
+    const result = await this.meetupSearch.search(searchText);
+    return result;
   }
 
   async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto): Promise<MeetupEntity> {
@@ -41,6 +49,7 @@ export class MeetupService {
       };
 
       const createdMeetup = await this.meetupRepository.create(meetupCreationAttrs, transaction);
+      await this.meetupSearch.create(createdMeetup);
       return createdMeetup;
     });
     return transactionResult;
@@ -96,10 +105,12 @@ export class MeetupService {
         description: updateMeetupDto.description || existingMeetup.description,
         date: updateMeetupDto.date || existingMeetup.date,
         place: updateMeetupDto.place || existingMeetup.place,
+        organizerId: existingMeetup.organizerId,
         tags: tags,
       };
 
       const updatedMeetup = await this.meetupRepository.update(id, meetupUpdateAttrs, transaction);
+      await this.meetupSearch.update(updatedMeetup);
       return updatedMeetup;
     });
     return transactionResult;
@@ -122,6 +133,7 @@ export class MeetupService {
       const tags = existingMeetup.tags.map((obj) => obj.tag);
       await this.meetupRepository.deleteById(id, transaction);
       await this._deleteUnrelatedTags(tags, transaction);
+      await this.meetupSearch.delete(id);
     });
   }
 

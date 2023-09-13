@@ -15,9 +15,9 @@ import {
 import { JwtPayloadDto, ReadAllResult } from '@app/common';
 import { JoiValidationPipe, JwtAuthGuard, RolesGuard, UserFromRequest } from '../../common';
 import { MeetupService } from './meetup.service';
-import { CreateMeetupSchema, ReadAllMeetupSchema, UpdateMeetupSchema } from './schemas';
+import { CreateMeetupSchema, ReadAllMeetupSchema, SearchMeetupSchema, UpdateMeetupSchema } from './schemas';
 import { CreateMeetupDto, ReadAllMeetupDto, UpdateMeetupDto } from './dto';
-import { MeetupType } from './types';
+import { MeetupSearchResult, MeetupType } from './types';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('meetup')
@@ -34,11 +34,19 @@ export class MeetupController {
     return meetups;
   }
 
+  @Get('search')
+  @HttpCode(HttpStatus.OK)
+  async search(@Query(new JoiValidationPipe(SearchMeetupSchema)) query: any): Promise<MeetupSearchResult> {
+    const { text } = query;
+    const searchResult = await this.meetupService.search(text);
+    return searchResult;
+  }
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async readById(@Param('id', ParseIntPipe) id: number): Promise<MeetupType> {
-    const tag = await this.meetupService.readById(id);
-    return tag;
+    const meetup = await this.meetupService.readById(id);
+    return meetup;
   }
 
   @Post()

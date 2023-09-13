@@ -4,6 +4,7 @@ import { JwtPayloadDto, METADATA, ReadAllResult } from '@app/common';
 import { MeetupService } from './meetup.service';
 import { IReadAllMeetupOptions, MeetupType } from './types';
 import { CreateMeetupDto, UpdateMeetupDto } from './dto';
+import { MeetupSearchResult } from 'apps/api-gateway/src/modules/meetup/types';
 
 @Controller()
 export class MeetupController {
@@ -16,6 +17,12 @@ export class MeetupController {
       totalRecordsNumber: meetups.totalRecordsNumber,
       records: meetups.records.map((meetup) => new MeetupType(meetup)),
     };
+  }
+
+  @MessagePattern(METADATA.MP_SEARCH)
+  async search(@Payload('searchText') searchText: string): Promise<MeetupSearchResult> {
+    const data = await this.meetupService.search(searchText);
+    return data;
   }
 
   @MessagePattern(METADATA.MP_GET_MEETUP_BY_ID)
@@ -62,10 +69,7 @@ export class MeetupController {
   }
 
   @MessagePattern(METADATA.MP_DELETE_MEETUP_BY_ID)
-  async deleteById(
-    @Payload('id', ParseIntPipe) id: number,
-    @Payload('jwtPayload') jwtPayload: JwtPayloadDto,
-  ): Promise<string> {
+  async deleteById(@Payload('id', ParseIntPipe) id: number, @Payload('jwtPayload') jwtPayload: JwtPayloadDto): Promise<string> {
     await this.meetupService.deleteById(id, jwtPayload);
     return 'sucess';
   }

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtPayloadDto, METADATA, ReadAllResult } from '@app/common';
 import { MEETUP, sendMessage } from '../../common';
-import { IReadAllMeetupOptions, MeetupType } from './types';
+import { IReadAllMeetupOptions, MeetupSearchResult, MeetupType } from './types';
 import { CreateMeetupDto, UpdateMeetupDto } from './dto';
 
 @Injectable()
@@ -27,6 +27,15 @@ export class MeetupService {
     });
 
     return meetup;
+  }
+
+  async search(searchText: string): Promise<MeetupSearchResult> {
+    const searchResult = await sendMessage<MeetupSearchResult>({
+      client: this.client,
+      metadata: METADATA.MP_SEARCH,
+      data: { searchText },
+    });
+    return searchResult;
   }
 
   async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto): Promise<MeetupType> {
@@ -59,11 +68,11 @@ export class MeetupService {
     return meetup;
   }
 
-  async update(id: number, updateTagDto: UpdateMeetupDto, jwtPayload: JwtPayloadDto): Promise<MeetupType> {
+  async update(id: number, updateMeetupDto: UpdateMeetupDto, jwtPayload: JwtPayloadDto): Promise<MeetupType> {
     const updatedTag = await sendMessage<MeetupType>({
       client: this.client,
       metadata: METADATA.MP_UPDATE_MEETUP_BY_ID,
-      data: { id, updateTagDto, jwtPayload },
+      data: { id, updateMeetupDto, jwtPayload },
     });
 
     return updatedTag;
