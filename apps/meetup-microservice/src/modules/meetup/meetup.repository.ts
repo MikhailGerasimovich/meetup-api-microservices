@@ -16,8 +16,18 @@ export class MeetupRepository {
     const direction = readAllOptions?.sorting?.direction ?? defaultSorting.direction;
     const filters = getMeetupFilters(readAllOptions.filters);
 
+    const geopositionSearchParam = {};
+    if (Object.keys(filters.geoFilters).length != 0) {
+      const { latitude, longitude } = filters.geoFilters.geoposition;
+      const query = await this.prisma.$queryRaw<
+        { id: number }[]
+      >`SELECT id FROM "Meetups" WHERE ST_DWithin(ST_MakePoint(longitude::float, latitude::float), ST_MakePoint(${longitude}::float, ${latitude}::float)::geography, radius * 1000)`;
+
+      geopositionSearchParam['id'] = { in: query.map(({ id }) => id) };
+    }
+
     const records = await this.prisma.meetups.findMany({
-      where: { ...filters.meetupFilters, ...filters.tagFilters },
+      where: { ...filters.meetupFilters, ...filters.tagFilters, ...geopositionSearchParam },
       skip: offset(page, size),
       take: Number(size),
       orderBy: {
@@ -34,7 +44,7 @@ export class MeetupRepository {
     });
 
     const totalRecordsNumber = await this.prisma.meetups.count({
-      where: { ...filters.meetupFilters, ...filters.tagFilters },
+      where: { ...filters.meetupFilters, ...filters.tagFilters, ...geopositionSearchParam },
     });
 
     return { totalRecordsNumber, records };
@@ -63,6 +73,8 @@ export class MeetupRepository {
         description: meetupCreationAttrs.description,
         date: meetupCreationAttrs.date,
         place: meetupCreationAttrs.place,
+        latitude: meetupCreationAttrs.latitude,
+        longitude: meetupCreationAttrs.longitude,
         organizerId: Number(meetupCreationAttrs.organizerId),
         tags: {
           create: meetupCreationAttrs.tags.map((tag) => ({
@@ -133,6 +145,8 @@ export class MeetupRepository {
       description: String(meetupUpdateAttrs.description),
       date: meetupUpdateAttrs.date,
       place: meetupUpdateAttrs.place,
+      latitude: meetupUpdateAttrs.latitude,
+      longitude: meetupUpdateAttrs.longitude,
       organizerId: Number(meetupUpdateAttrs.organizerId),
     };
 

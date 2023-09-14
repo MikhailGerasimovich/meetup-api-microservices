@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Meetups" ALTER COLUMN "radius" DROP NOT NULL,
+ALTER COLUMN "radius" SET DEFAULT 100;

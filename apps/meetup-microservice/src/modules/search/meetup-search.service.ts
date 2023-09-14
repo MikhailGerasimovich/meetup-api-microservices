@@ -25,6 +25,8 @@ export class MeetupSearchService implements OnModuleInit {
         description: meetup.description,
         date: meetup.date,
         place: meetup.place,
+        latitude: meetup.latitude,
+        longitude: meetup.longitude,
         tags: meetup.tags.map((tag) => ({ id: tag.id, title: tag.title })),
       },
     });
@@ -74,6 +76,8 @@ export class MeetupSearchService implements OnModuleInit {
         description: meetup.description,
         date: meetup.date,
         place: meetup.place,
+        latitude: meetup.latitude,
+        longitude: meetup.longitude,
         tags: meetup.tags.map((tag) => ({ id: tag.id, title: tag.title })),
       },
     });

@@ -4,6 +4,8 @@ export interface MeetupSearchBody {
   description: string;
   date: string;
   place: string;
+  latitude: number;
+  longitude: number;
   tags: {
     id: number;
     title: string;

@@ -7,6 +7,10 @@ export const ReadAllMeetupSchema = Joi.object<ReadAllMeetupDto>({
   description: Joi.string().optional(),
   date: Joi.string().optional(),
   place: Joi.string().optional(),
+  geoposition: Joi.object({
+    latitude: Joi.number().required(),
+    longitude: Joi.number().required(),
+  }).optional(),
   tags: Joi.array().items(Joi.string()).optional(),
   organizerId: Joi.number().optional(),
 

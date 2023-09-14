@@ -15,9 +15,14 @@ model Meetups {
   date        String
   place       String
 
-  tags        MeetupsToTags[]
-  members     Members[]
   organizerId Int
+
+  latitude  Float
+  longitude Float
+  radius    Int?  @default(100)
+
+  tags    MeetupsToTags[]
+  members Members[]
 }
 
 model Tags {

@@ -6,8 +6,12 @@ export interface IReadAllMeetupOptions {
     description?: string;
     date?: string;
     place?: string;
-    tags: string[];
-    organizerId: number;
+    geoposition?: {
+      latitude: number;
+      longitude: number;
+    };
+    tags?: string[];
+    organizerId?: number;
   };
   pagination?: IPaginationOptions;
   sorting?: ISortingOptions;

@@ -5,6 +5,8 @@ export class MeetupCreationAttrs {
   description: string;
   date: string;
   place: string;
+  latitude: number;
+  longitude: number;
   tags: TagEntity[];
   organizerId: number;
 }

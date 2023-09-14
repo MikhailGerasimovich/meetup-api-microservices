@@ -12,6 +12,9 @@ async function main() {
       place: 'Vitebsk, Bogdan Khmelnitsky Street, 30',
       date: '12-12-2022 12:12:12',
       organizerId: 1,
+      latitude: 55.201639,
+      longitude: 30.267639,
+      radius: 100,
       tags: {
         create: [
           {
@@ -32,6 +35,9 @@ async function main() {
       place: 'Vitebsk, Bogdan Khmelnitsky Street, 30',
       date: '12-12-2022 12:12:12',
       organizerId: 2,
+      latitude: 55.201639,
+      longitude: 30.267639,
+      radius: 100,
       tags: {
         create: [
           {
@@ -52,6 +58,9 @@ async function main() {
       place: 'Vitebsk, Bogdan Khmelnitsky Street, 30',
       date: '12-12-2022 12:12:12',
       organizerId: 2,
+      latitude: 55.201639,
+      longitude: 30.267639,
+      radius: 100,
       tags: {
         create: [
           {

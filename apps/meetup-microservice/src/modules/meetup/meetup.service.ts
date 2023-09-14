@@ -44,6 +44,8 @@ export class MeetupService {
         description: createMeetupDto.description,
         date: createMeetupDto.date,
         place: createMeetupDto.place,
+        latitude: createMeetupDto.latitude,
+        longitude: createMeetupDto.longitude,
         tags: tags,
         organizerId: organizer.id,
       };
@@ -105,6 +107,8 @@ export class MeetupService {
         description: updateMeetupDto.description || existingMeetup.description,
         date: updateMeetupDto.date || existingMeetup.date,
         place: updateMeetupDto.place || existingMeetup.place,
+        latitude: updateMeetupDto.latitude || existingMeetup.latitude,
+        longitude: updateMeetupDto.longitude || existingMeetup.longitude,
         organizerId: existingMeetup.organizerId,
         tags: tags,
       };

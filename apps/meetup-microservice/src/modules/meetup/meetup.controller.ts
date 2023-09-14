@@ -4,7 +4,7 @@ import { JwtPayloadDto, METADATA, ReadAllResult } from '@app/common';
 import { MeetupService } from './meetup.service';
 import { IReadAllMeetupOptions, MeetupType } from './types';
 import { CreateMeetupDto, UpdateMeetupDto } from './dto';
-import { MeetupSearchResult } from 'apps/api-gateway/src/modules/meetup/types';
+import { MeetupSearchResult } from '../search/types';
 
 @Controller()
 export class MeetupController {

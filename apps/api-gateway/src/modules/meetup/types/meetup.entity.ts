@@ -9,6 +9,8 @@ export class MeetupEntity {
   description: string;
   date: string;
   place: string;
+  latitude: number;
+  longitude: number;
   tags?: { tag: TagEntity }[];
   organizerId: number;
 }

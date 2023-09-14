@@ -6,6 +6,8 @@ export class MeetupType {
   description: string;
   date: string;
   place: string;
+  latitude: number;
+  longitude: number;
   organiserId: number;
   tags?: {
     id?: number;
@@ -18,6 +20,8 @@ export class MeetupType {
     this.description = meetup?.description;
     this.date = meetup?.date;
     this.place = meetup?.place;
+    this.latitude = meetup?.latitude;
+    this.longitude = meetup?.longitude;
     this.organiserId = meetup?.organizerId;
     this.tags = meetup?.tags?.map((obj) => ({
       id: obj.tag.id,
