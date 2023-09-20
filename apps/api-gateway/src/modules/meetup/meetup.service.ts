@@ -19,6 +19,15 @@ export class MeetupService {
     return meetups;
   }
 
+  async search(searchText: string): Promise<MeetupSearchResult> {
+    const searchResult = await sendMessage<MeetupSearchResult>({
+      client: this.client,
+      metadata: METADATA.MP_SEARCH,
+      data: { searchText },
+    });
+    return searchResult;
+  }
+
   async readById(id: number): Promise<MeetupType> {
     const meetup = await sendMessage<MeetupType>({
       client: this.client,
@@ -27,15 +36,6 @@ export class MeetupService {
     });
 
     return meetup;
-  }
-
-  async search(searchText: string): Promise<MeetupSearchResult> {
-    const searchResult = await sendMessage<MeetupSearchResult>({
-      client: this.client,
-      metadata: METADATA.MP_SEARCH,
-      data: { searchText },
-    });
-    return searchResult;
   }
 
   async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto): Promise<MeetupType> {

@@ -11,13 +11,16 @@ import {
   Query,
   UseGuards,
   ParseIntPipe,
+  Res,
 } from '@nestjs/common';
+import { stringify } from 'csv-stringify';
 import { JwtPayloadDto, ReadAllResult } from '@app/common';
 import { JoiValidationPipe, JwtAuthGuard, RolesGuard, UserFromRequest } from '../../common';
 import { MeetupService } from './meetup.service';
 import { CreateMeetupSchema, ReadAllMeetupSchema, SearchMeetupSchema, UpdateMeetupSchema } from './schemas';
 import { CreateMeetupDto, ReadAllMeetupDto, UpdateMeetupDto } from './dto';
 import { MeetupSearchResult, MeetupType } from './types';
+import { Response } from 'express';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('meetup')
@@ -40,6 +43,26 @@ export class MeetupController {
     const { text } = query;
     const searchResult = await this.meetupService.search(text);
     return searchResult;
+  }
+
+  @Get('generate-report/csv')
+  @HttpCode(HttpStatus.OK)
+  async generateCsvReport(
+    @Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto,
+    @Res() res: Response,
+  ) {
+    const { pagination, sorting, ...filters } = readAllMeetupDto;
+    const meetups = await this.meetupService.readAll({ pagination, sorting, filters });
+
+    stringify(meetups.records, { header: true, delimiter: ';' }, (err, csvData) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+
+      res.attachment('data.csv');
+      res.setHeader('Content-Type', 'text/csv');
+      res.send(csvData);
+    });
   }
 
   @Get(':id')
