@@ -13,7 +13,6 @@ import {
   ParseIntPipe,
   Res,
 } from '@nestjs/common';
-import { stringify } from 'csv-stringify';
 import { JwtPayloadDto, ReadAllResult } from '@app/common';
 import { JoiValidationPipe, JwtAuthGuard, RolesGuard, UserFromRequest } from '../../common';
 import { MeetupService } from './meetup.service';
@@ -46,23 +45,15 @@ export class MeetupController {
   }
 
   @Get('generate-report/csv')
-  @HttpCode(HttpStatus.OK)
-  async generateCsvReport(
-    @Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto,
-    @Res() res: Response,
-  ) {
+  async csvReport(@Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto, @Res() res: Response) {
     const { pagination, sorting, ...filters } = readAllMeetupDto;
-    const meetups = await this.meetupService.readAll({ pagination, sorting, filters });
+    await this.meetupService.generateCsvReport({ pagination, sorting, filters }, res);
+  }
 
-    stringify(meetups.records, { header: true, delimiter: ';' }, (err, csvData) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-
-      res.attachment('data.csv');
-      res.setHeader('Content-Type', 'text/csv');
-      res.send(csvData);
-    });
+  @Get('generate-report/pdf')
+  async pdfReport(@Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto, @Res() res: Response) {
+    const { pagination, sorting, ...filters } = readAllMeetupDto;
+    await this.meetupService.generatePdfReport({ pagination, sorting, filters }, res);
   }
 
   @Get(':id')
