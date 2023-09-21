@@ -11,6 +11,7 @@ import {
   Query,
   UseGuards,
   ParseIntPipe,
+  Res,
 } from '@nestjs/common';
 import { JwtPayloadDto, ReadAllResult } from '@app/common';
 import { JoiValidationPipe, JwtAuthGuard, RolesGuard, UserFromRequest } from '../../common';
@@ -18,6 +19,7 @@ import { MeetupService } from './meetup.service';
 import { CreateMeetupSchema, ReadAllMeetupSchema, SearchMeetupSchema, UpdateMeetupSchema } from './schemas';
 import { CreateMeetupDto, ReadAllMeetupDto, UpdateMeetupDto } from './dto';
 import { MeetupSearchResult, MeetupType } from './types';
+import { Response } from 'express';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('meetup')
@@ -40,6 +42,18 @@ export class MeetupController {
     const { text } = query;
     const searchResult = await this.meetupService.search(text);
     return searchResult;
+  }
+
+  @Get('generate-report/csv')
+  async csvReport(@Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto, @Res() res: Response) {
+    const { pagination, sorting, ...filters } = readAllMeetupDto;
+    await this.meetupService.generateCsvReport({ pagination, sorting, filters }, res);
+  }
+
+  @Get('generate-report/pdf')
+  async pdfReport(@Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto, @Res() res: Response) {
+    const { pagination, sorting, ...filters } = readAllMeetupDto;
+    await this.meetupService.generatePdfReport({ pagination, sorting, filters }, res);
   }
 
   @Get(':id')

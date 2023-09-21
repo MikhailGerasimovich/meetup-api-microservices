@@ -2,14 +2,18 @@ import { NestFactory } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import { ApiGatewayModule } from './api-gateway.module';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ApiGatewayModule);
+  const app = await NestFactory.create<NestExpressApplication>(ApiGatewayModule);
 
   const configService = new ConfigService();
   const port = configService.get<number>('PORT');
 
   app.use(cookieParser());
+  app.setBaseViewsDir('./apps/api-gateway/src/modules/meetup/report-templates');
+
+  app.setViewEngine('ejs');
   await app.listen(port);
 }
 
