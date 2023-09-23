@@ -1,0 +1,109 @@
+# docker-compose.yml
+
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5672:5672'
+
+  meetup-microservice:
+    build:
+      context: .
+      dockerfile: ./apps/meetup-microservice/Dockerfile
+    command: npm run start:dev meetup-microservice && generate:meetup:docker && migrate:meetup:docker && seed:meetup:docker
+    env_file:
+      - ./apps/meetup-microservice/.envDocker
+    depends_on:
+      - postgres-meetup
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  authorization-microservice:
+    build:
+      context: .
+      dockerfile: ./apps/authorization-microservice/Dockerfile
+    command: npm run start:dev authorization-microservice && generate:auth:docker && migrate:auth:docker && seed:auth:docker
+    env_file:
+      - ./apps/authorization-microservice/.envDocker
+    depends_on:
+      - postgres-auth
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+    command: npm run start:dev api-gateway
+    env_file:
+      - ./apps/api-gateway/.envDocker
+    depends_on:
+      - authorization-microservice
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 3000:3000
+
+  elasticsearch:
+    image: elasticsearch:7.8.1
+    ports:
+      - 9200:9200
+    env_file:
+      - ./apps/meetup-microservice/.envDocker
+    environment:
+      discovery.type: 'single-node'
+      xpack.security.enabled: 'true'
+      ELASTIC_PASSWORD: 'PmfFTm2FGJQlOHfa8xgW'
+  kibana:
+    image: kibana:7.8.1
+    env_file:
+      - ./apps/meetup-microservice/.envDocker
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601
+
+  postgres-auth:
+    image: postgres:13.5
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=957483
+      - POSTGRES_DB=auth_microservice_db
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  postgres-meetup:
+    image: postgres:13.5
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=957483
+      - POSTGRES_DB=meetup_microservice_db
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5433
+    expose:
+      - '5433'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5433:5433'
+    command:
+      - -p 5433
+
+volumes:
+  postgres:
+  esData01:
+networks:
+  elastic:

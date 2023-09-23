@@ -24,7 +24,16 @@
     "generate:meetup": "dotenv -e ./apps/meetup-microservice/.env -- npx prisma generate --schema=./apps/meetup-microservice/prisma/schema.prisma",
     "seed:auth": "dotenv -e ./apps/meetup-microservice/.env -- ts-node ./apps/authorization-microservice/prisma/seed.ts",
     "seed:meetup": "dotenv -e ./apps/meetup-microservice/.env -- ts-node ./apps/meetup-microservice/prisma/seed.ts",
-    "db": "npm run migrate:auth && npm run migrate:meetup && npm run generate:auth && npm run generate:meetup && npm run seed:auth && npm run seed:meetup"
+    "db": "npm run migrate:auth && npm run migrate:meetup && npm run generate:auth && npm run generate:meetup && npm run seed:auth && npm run seed:meetup",
+
+    "migrate:auth:docker": "dotenv -e ./apps/authorization-microservice/.envDocker -- npx prisma migrate dev --schema=./apps/authorization-microservice/prisma/schema.prisma",
+    "migrate:meetup:docker": "dotenv -e ./apps/meetup-microservice/.envDocker -- npx prisma migrate dev --schema=./apps/meetup-microservice/prisma/schema.prisma",
+    "generate:auth:docker": "dotenv -e ./apps/authorization-microservice/.envDocker -- npx prisma generate --schema=./apps/authorization-microservice/prisma/schema.prisma",
+    "generate:meetup:docker": "dotenv -e ./apps/meetup-microservice/.envDocker -- npx prisma generate --schema=./apps/meetup-microservice/prisma/schema.prisma",
+    "seed:auth:docker": "dotenv -e ./apps/meetup-microservice/.envDocker -- ts-node ./apps/authorization-microservice/prisma/seed.ts",
+    "seed:meetup:docker": "dotenv -e ./apps/meetup-microservice/.envDocker -- ts-node ./apps/meetup-microservice/prisma/seed.ts",
+    "db:docker": "npm run migrate:auth:docker && npm run migrate:meetup:docker && npm run generate:auth:docker && npm run generate:meetup:docker && npm run seed:auth:docker && npm run seed:meetup:docker"
+
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.9.0",
