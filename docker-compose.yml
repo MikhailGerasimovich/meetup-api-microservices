@@ -51,25 +51,6 @@ services:
     ports:
       - 3000:3000
 
-  elasticsearch:
-    image: elasticsearch:7.8.1
-    ports:
-      - 9200:9200
-    env_file:
-      - ./apps/meetup-microservice/.envDocker
-    environment:
-      discovery.type: 'single-node'
-      xpack.security.enabled: 'true'
-      ELASTIC_PASSWORD: 'PmfFTm2FGJQlOHfa8xgW'
-  kibana:
-    image: kibana:7.8.1
-    env_file:
-      - ./apps/meetup-microservice/.envDocker
-    volumes:
-      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
-    ports:
-      - 5601:5601
-
   postgres-auth:
     image: postgres:13.5
     restart: always
@@ -102,8 +83,40 @@ services:
     command:
       - -p 5433
 
+  elasticsearch:
+    container_name: es-container
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.1
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    volumes:
+      - ./esdata:/usr/share/elasticsearch/data
+    networks:
+      - es-net
+    ports:
+      - 9200:9200
+  kibana:
+    container_name: kb-container
+    image: docker.elastic.co/kibana/kibana:8.9.1
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es-container:9200
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - es-net
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+    volumes:
+      - kibanadata:/usr/share/kibana/data
+
+networks:
+  es-net:
+    driver: bridge
+
 volumes:
   postgres:
-  esData01:
-networks:
-  elastic:
+  esdata:
+    driver: local
+  kibanadata:
+    driver: local
