@@ -7,7 +7,7 @@ import { MeetupModule } from './modules/meetup/meetup.module';
 import { DatabaseModule } from './modules/database/database.module';
 
 const DefineConfigModule = ConfigModule.forRoot({
-  envFilePath: './apps/meetup-microservice/.env',
+  envFilePath: './apps/meetup/.env',
   isGlobal: true,
 });
 
