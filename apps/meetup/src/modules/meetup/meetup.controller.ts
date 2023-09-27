@@ -11,7 +11,9 @@ export class MeetupController {
   constructor(private readonly meetupService: MeetupService) {}
 
   @MessagePattern(METADATA.MP_GET_ALL_MEETUPS)
-  async readAll(@Payload() readAllMeetupOptions: IReadAllMeetupOptions): Promise<ReadAllResult<MeetupType>> {
+  async readAll(
+    @Payload('readAllMeetupOptions') readAllMeetupOptions: IReadAllMeetupOptions,
+  ): Promise<ReadAllResult<MeetupType>> {
     const meetups = await this.meetupService.readAll(readAllMeetupOptions);
     return {
       totalRecordsNumber: meetups.totalRecordsNumber,
@@ -69,8 +71,7 @@ export class MeetupController {
   }
 
   @MessagePattern(METADATA.MP_DELETE_MEETUP_BY_ID)
-  async deleteById(@Payload('id', ParseIntPipe) id: number, @Payload('jwtPayload') jwtPayload: JwtPayloadDto): Promise<string> {
+  async deleteById(@Payload('id', ParseIntPipe) id: number, @Payload('jwtPayload') jwtPayload: JwtPayloadDto): Promise<void> {
     await this.meetupService.deleteById(id, jwtPayload);
-    return 'sucess';
   }
 }

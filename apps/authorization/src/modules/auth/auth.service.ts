@@ -17,17 +17,18 @@ export class AuthService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async validateUser(supposedEmail: string, password: string): Promise<JwtPayloadDto> {
+  async validateUser(supposedEmail: string, pass: string): Promise<JwtPayloadDto> {
     const selectFields = ['password', 'role', 'provider'];
     const candidate = await this.userService.readByEmail(supposedEmail, selectFields);
-    if (candidate && candidate.provider == 'local' && compareSync(password, candidate.password)) {
-      return { id: candidate.id, role: candidate.role };
+    const { id, role, password, provider } = candidate;
+    if (candidate && provider == 'local' && compareSync(pass, password)) {
+      return { id, role };
     }
 
     throw new RpcException({ message: 'wrong login or password', statusCode: HttpStatus.BAD_REQUEST });
   }
 
-  async registration(createUserDto: CreateUserDto): Promise<JwtType> {
+  async register(createUserDto: CreateUserDto): Promise<JwtType> {
     const transactionResult = await this.prisma.$transaction(async (transaction: TransactionClient) => {
       const registratedUser = await this.createLocalUser(createUserDto, transaction);
       const { id, role } = registratedUser;

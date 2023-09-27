@@ -37,7 +37,7 @@ export class MeetupService {
 
   async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto): Promise<MeetupEntity> {
     const transactionResult = await this.prisma.$transaction(async (transaction: TransactionClient) => {
-      const tags = await this._createTagsIfNotExist(createMeetupDto.tags, transaction);
+      const tags = await this.createTagsIfNotExist(createMeetupDto.tags, transaction);
 
       const meetupCreationAttrs: MeetupCreationAttrs = {
         title: createMeetupDto.title,
@@ -100,7 +100,7 @@ export class MeetupService {
         });
       }
 
-      const tags = updateMeetupDto.tags ? await this._createTagsIfNotExist(updateMeetupDto.tags, transaction) : null;
+      const tags = updateMeetupDto.tags ? await this.createTagsIfNotExist(updateMeetupDto.tags, transaction) : null;
 
       const meetupUpdateAttrs: MeetupUpdateAttrs = {
         title: updateMeetupDto.title || existingMeetup.title,
@@ -136,12 +136,12 @@ export class MeetupService {
 
       const tags = existingMeetup.tags.map((obj) => obj.tag);
       await this.meetupRepository.deleteById(id, transaction);
-      await this._deleteUnrelatedTags(tags, transaction);
+      await this.deleteUnrelatedTags(tags, transaction);
       await this.meetupSearch.delete(id);
     });
   }
 
-  private async _createTagsIfNotExist(tagsTitle: string[], transaction?: TransactionClient): Promise<TagEntity[]> {
+  private async createTagsIfNotExist(tagsTitle: string[], transaction?: TransactionClient): Promise<TagEntity[]> {
     const tags = [];
     for await (let title of tagsTitle) {
       const existingTag = await this.tagService.readByTitle(title, transaction);
@@ -154,7 +154,7 @@ export class MeetupService {
     return tags;
   }
 
-  private async _deleteUnrelatedTags(tags: TagEntity[], transaction?: TransactionClient) {
+  private async deleteUnrelatedTags(tags: TagEntity[], transaction?: TransactionClient) {
     for await (let tag of tags) {
       const isRelatedTag = await this.tagService.isRelated(tag.id, transaction);
       if (!isRelatedTag) {

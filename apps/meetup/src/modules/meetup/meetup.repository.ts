@@ -67,17 +67,13 @@ export class MeetupRepository {
 
   async create(meetupCreationAttrs: MeetupCreationAttrs, transaction?: TransactionClient): Promise<MeetupEntity> {
     const executer = transaction ? transaction : this.prisma;
+    const { organizerId, tags, ...rest } = meetupCreationAttrs;
     const createdMeetup = await executer.meetups.create({
       data: {
-        title: meetupCreationAttrs.title,
-        description: meetupCreationAttrs.description,
-        date: meetupCreationAttrs.date,
-        place: meetupCreationAttrs.place,
-        latitude: meetupCreationAttrs.latitude,
-        longitude: meetupCreationAttrs.longitude,
-        organizerId: Number(meetupCreationAttrs.organizerId),
+        ...rest,
+        organizerId: Number(organizerId),
         tags: {
-          create: meetupCreationAttrs.tags.map((tag) => ({
+          create: tags.map((tag) => ({
             tag: { connect: { id: Number(tag.id) } },
           })),
         },
@@ -140,14 +136,10 @@ export class MeetupRepository {
 
   async update(id: number, meetupUpdateAttrs: MeetupUpdateAttrs, transaction?: TransactionClient): Promise<MeetupEntity> {
     const executer = transaction ? transaction : this.prisma;
+    const { organizerId, ...rest } = meetupUpdateAttrs;
     const data: any = {
-      title: meetupUpdateAttrs.title,
-      description: String(meetupUpdateAttrs.description),
-      date: meetupUpdateAttrs.date,
-      place: meetupUpdateAttrs.place,
-      latitude: meetupUpdateAttrs.latitude,
-      longitude: meetupUpdateAttrs.longitude,
-      organizerId: Number(meetupUpdateAttrs.organizerId),
+      ...rest,
+      organizerId: Number(organizerId),
     };
 
     if (meetupUpdateAttrs.tags) {

@@ -17,16 +17,11 @@ export class MeetupSearchService implements OnModuleInit {
 
   async create(meetupEntity: MeetupEntity): Promise<void> {
     const meetup = new MeetupType(meetupEntity);
+    const { tags, ...rest } = meetupEntity;
     await this.elasticsearchService.index<MeetupSearchBody>({
       index: this.index,
       document: {
-        id: meetup.id,
-        title: meetup.title,
-        description: meetup.description,
-        date: meetup.date,
-        place: meetup.place,
-        latitude: meetup.latitude,
-        longitude: meetup.longitude,
+        ...rest,
         tags: meetup.tags.map((tag) => ({ id: tag.id, title: tag.title })),
       },
     });
@@ -67,17 +62,12 @@ export class MeetupSearchService implements OnModuleInit {
       },
     });
     const documentId = document.hits.hits[0]._id;
+    const { tags, ...rest } = meetupEntity;
     await this.elasticsearchService.update({
       index: this.index,
       id: documentId,
       doc: {
-        id: meetup.id,
-        title: meetup.title,
-        description: meetup.description,
-        date: meetup.date,
-        place: meetup.place,
-        latitude: meetup.latitude,
-        longitude: meetup.longitude,
+        ...rest,
         tags: meetup.tags.map((tag) => ({ id: tag.id, title: tag.title })),
       },
     });

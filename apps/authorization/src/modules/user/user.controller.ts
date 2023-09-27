@@ -9,7 +9,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @MessagePattern(METADATA.MP_GET_ALL_USERS)
-  async readAll(@Payload() readAllUserOptions: IReadAllUserOptions): Promise<ReadAllResult<UserType>> {
+  async readAll(@Payload('readAllUserOptions') readAllUserOptions: IReadAllUserOptions): Promise<ReadAllResult<UserType>> {
     const users = await this.userService.readAll(readAllUserOptions);
     return {
       totalRecordsNumber: users.totalRecordsNumber,
@@ -24,16 +24,12 @@ export class UserController {
   }
 
   @MessagePattern(METADATA.MP_DELETE_USER_BY_ID)
-  async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<string> {
+  async deleteById(@Payload('id', ParseIntPipe) id: number): Promise<void> {
     await this.userService.deleteById(id);
-    return 'success';
   }
 
   @MessagePattern(METADATA.MP_UPLOAD_AVATAR)
-  async uploadAvatar(
-    @Payload('id', ParseIntPipe) id: number,
-    @Payload('filename') filename: string,
-  ): Promise<AvatarDto> {
+  async uploadAvatar(@Payload('id', ParseIntPipe) id: number, @Payload('filename') filename: string): Promise<AvatarDto> {
     const avatarDto = await this.userService.uploadAvatar(id, filename);
     return avatarDto;
   }

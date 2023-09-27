@@ -20,10 +20,7 @@ export class TagService {
   }
 
   async create(createTagDto: CreateTagDto, transaction?: TransactionClient): Promise<TagEntity> {
-    const tagCreationAttrs: TagCreationAttrs = {
-      title: createTagDto.title,
-    };
-
+    const tagCreationAttrs: TagCreationAttrs = { ...createTagDto };
     const createdTag = await this.tagRepository.create(tagCreationAttrs, transaction);
     return createdTag;
   }

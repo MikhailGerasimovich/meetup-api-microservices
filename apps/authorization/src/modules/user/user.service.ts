@@ -36,9 +36,7 @@ export class UserService {
     transaction?: TransactionClient,
   ): Promise<UserEntity> {
     const userCreationAttrs: UserCreationAttrs = {
-      username: createUserDto.username,
-      email: createUserDto.email,
-      password: createUserDto.password,
+      ...createUserDto,
       provider,
       role: ROLES.USER,
     };
@@ -78,7 +76,7 @@ export class UserService {
       throw new RpcException({ message: `No avatars to download`, statusCode: HttpStatus.BAD_REQUEST });
     }
 
-    const avatarDto: AvatarDto = { avatarFilename: avatarFilename };
+    const avatarDto: AvatarDto = { avatarFilename };
     return avatarDto;
   }
 
@@ -90,9 +88,7 @@ export class UserService {
       throw new RpcException({ message: `No avatars to remove`, statusCode: HttpStatus.BAD_REQUEST });
     }
     await this.userRepository.removeAvatar(id);
-    const avatarDto: AvatarDto = {
-      avatarFilename: avatarFilename,
-    };
+    const avatarDto: AvatarDto = { avatarFilename };
     return avatarDto;
   }
 }

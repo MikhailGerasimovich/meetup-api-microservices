@@ -68,14 +68,7 @@ export class UserRepository {
     const executer = transaction ? transaction : this.prisma;
     const toSelect = this.getSelectFields(selectFields);
     const createdUser = await executer.users.create({
-      data: {
-        username: userCreationAttrs.username,
-        email: userCreationAttrs.email,
-        password: userCreationAttrs.password,
-        provider: userCreationAttrs.provider,
-        role: userCreationAttrs.role,
-      },
-
+      data: { ...userCreationAttrs },
       select: {
         id: true,
         ...toSelect,
