@@ -2,6 +2,7 @@ export * from './constants/constants';
 
 export * from './decorators/roles.decorator';
 export * from './decorators/user-from-request.decorator';
+export * from './decorators/tokens-from-request.decorator';
 
 export * from './guards/jwt.guard';
 export * from './guards/local.guard';

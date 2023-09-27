@@ -1,15 +1,7 @@
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
-
-type SendMessageOptions = {
-  client: ClientProxy;
-  metadata: string;
-  data: any;
-};
+import { SendMessageOptions } from '../types';
 
 export async function sendMessage<T>(sendMessageOptions: SendMessageOptions): Promise<T> {
-  const response = await firstValueFrom(
-    sendMessageOptions.client.send(sendMessageOptions.metadata, sendMessageOptions.data),
-  );
+  const { client, metadata, data } = sendMessageOptions;
+  const response = await client.send(metadata, data).toPromise();
   return response;
 }

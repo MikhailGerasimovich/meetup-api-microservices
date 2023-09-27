@@ -9,60 +9,37 @@ import { UserEntity } from './types';
 export class AuthService {
   constructor(@Inject(AUTH.RMQ_CLIENT_NAME) private readonly client: ClientProxy) {}
 
-  async registration(createUserDto: CreateUserDto): Promise<JwtType> {
-    const user = await sendMessage<JwtType>({
-      client: this.client,
-      metadata: METADATA.MP_REGISTRATION,
-      data: { createUserDto },
-    });
-
+  async register(createUserDto: CreateUserDto): Promise<JwtType> {
+    const user = await this.sendMessageToAuthClient<JwtType>(METADATA.MP_REGISTRATION, { createUserDto });
     return user;
   }
 
   async localLogin(user: UserEntity): Promise<JwtType> {
-    const tokens = await sendMessage<JwtType>({
-      client: this.client,
-      metadata: METADATA.MP_LOCAL_LOGIN,
-      data: { user },
-    });
-
+    const tokens = await this.sendMessageToAuthClient<JwtType>(METADATA.MP_LOCAL_LOGIN, { user });
     return tokens;
   }
 
   async yandexLogin(yandexUser: YandexUser): Promise<JwtType> {
-    const tokens = await sendMessage<JwtType>({
-      client: this.client,
-      metadata: METADATA.MP_YANDEX_LOGIN,
-      data: yandexUser,
-    });
+    const tokens = await this.sendMessageToAuthClient<JwtType>(METADATA.MP_YANDEX_LOGIN, { yandexUser });
     return tokens;
   }
 
   async logout(jwtPayload: JwtPayloadDto, refreshToken: string): Promise<void> {
-    await sendMessage({
-      client: this.client,
-      metadata: METADATA.MP_LOGOUT,
-      data: { jwtPayload, refreshToken },
-    });
+    await this.sendMessageToAuthClient(METADATA.MP_LOGOUT, { jwtPayload, refreshToken });
   }
 
   async refresh(jwtPayload: JwtPayloadDto, refreshToken: string): Promise<JwtType> {
-    const tokens = await sendMessage<JwtType>({
-      client: this.client,
-      metadata: METADATA.MP_REFRESH,
-      data: { jwtPayload, refreshToken },
-    });
-
+    const tokens = await this.sendMessageToAuthClient<JwtType>(METADATA.MP_REFRESH, { jwtPayload, refreshToken });
     return tokens;
   }
 
   async validateUser(email: string, password: string): Promise<JwtPayloadDto> {
-    const validate = await sendMessage<JwtPayloadDto>({
-      client: this.client,
-      metadata: METADATA.MP_VALIDATE_USER,
-      data: { email, password },
-    });
-
+    const validate = await this.sendMessageToAuthClient<JwtPayloadDto>(METADATA.MP_VALIDATE_USER, { email, password });
     return validate;
+  }
+
+  private async sendMessageToAuthClient<T>(metadata: string, data: any): Promise<T> {
+    const res = await sendMessage<T>({ client: this.client, metadata, data });
+    return res;
   }
 }

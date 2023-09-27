@@ -18,31 +18,17 @@ export class UserService {
   ) {}
 
   async readAll(readAllUserOptions: IReadAllUserOptions): Promise<ReadAllResult<UserType>> {
-    const users = await sendMessage<ReadAllResult<UserType>>({
-      client: this.client,
-      metadata: METADATA.MP_GET_ALL_USERS,
-      data: readAllUserOptions,
-    });
-
+    const users = await this.sendMessageToUserClient<ReadAllResult<UserType>>(METADATA.MP_GET_ALL_USERS, { readAllUserOptions });
     return users;
   }
 
   async readById(id: number): Promise<UserType> {
-    const user = await sendMessage<UserType>({
-      client: this.client,
-      metadata: METADATA.MP_GET_USER_BY_ID,
-      data: { id },
-    });
-
+    const user = await this.sendMessageToUserClient<UserType>(METADATA.MP_GET_USER_BY_ID, { id });
     return user;
   }
 
   async deleteById(id: number): Promise<void> {
-    await sendMessage<void>({
-      client: this.client,
-      metadata: METADATA.MP_DELETE_USER_BY_ID,
-      data: { id },
-    });
+    await this.sendMessageToUserClient<void>(METADATA.MP_DELETE_USER_BY_ID, { id });
   }
 
   async uploadAvatar(jwtPayload: JwtPayloadDto, file: Express.Multer.File): Promise<void> {
@@ -52,10 +38,9 @@ export class UserService {
       throw new BadGatewayException('Failed to upload image to server');
     }
 
-    const avatarDto: AvatarDto = await sendMessage<AvatarDto>({
-      client: this.client,
-      metadata: METADATA.MP_UPLOAD_AVATAR,
-      data: { id: jwtPayload.id, filename },
+    const avatarDto: AvatarDto = await this.sendMessageToUserClient<AvatarDto>(METADATA.MP_UPLOAD_AVATAR, {
+      id: jwtPayload.id,
+      filename,
     });
 
     if (avatarDto.hasOldAvatar) {
@@ -65,13 +50,8 @@ export class UserService {
   }
 
   async downloadAvatar(id: number): Promise<DownloadedFile> {
-    const avatarDto: AvatarDto = await sendMessage<AvatarDto>({
-      client: this.client,
-      metadata: METADATA.MP_DOWNLOAD_AVATAR,
-      data: { id },
-    });
+    const avatarDto: AvatarDto = await this.sendMessageToUserClient<AvatarDto>(METADATA.MP_DOWNLOAD_AVATAR, { id });
     const folder = this.configService.get<string>('AVATAR_FOLDER_NAME');
-
     const file = await this.awsService.download(folder, avatarDto.avatarFilename);
     if (!file) {
       throw new BadGatewayException('Failed to download image from server');
@@ -80,15 +60,16 @@ export class UserService {
   }
 
   async removeAvatar(jwtPayload: JwtPayloadDto): Promise<void> {
-    const avatarDto: AvatarDto = await sendMessage<AvatarDto>({
-      client: this.client,
-      metadata: METADATA.MP_REMOVE_AVATAR,
-      data: { id: jwtPayload.id },
-    });
+    const avatarDto: AvatarDto = await this.sendMessageToUserClient<AvatarDto>(METADATA.MP_REMOVE_AVATAR, { id: jwtPayload.id });
     const folder = this.configService.get<string>('AVATAR_FOLDER_NAME');
     const isRemoved = await this.awsService.remove(folder, avatarDto.avatarFilename);
     if (!isRemoved) {
       throw new BadGatewayException('Failed to remove image from server');
     }
+  }
+
+  private async sendMessageToUserClient<T>(metadata: string, data: any): Promise<T> {
+    const res = await sendMessage<T>({ client: this.client, metadata, data });
+    return res;
   }
 }

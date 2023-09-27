@@ -5,27 +5,27 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": false,
-    "tsConfigPath": "apps/meetup-microservice/tsconfig.app.json"
+    "tsConfigPath": "apps/meetup/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/meetup-microservice",
+  "root": "apps/meetup",
   "projects": {
-    "meetup-microservice": {
+    "meetup": {
       "type": "application",
-      "root": "apps/meetup-microservice",
+      "root": "apps/meetup",
       "entryFile": "main",
-      "sourceRoot": "apps/meetup-microservice/src",
+      "sourceRoot": "apps/meetup/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/meetup-microservice/tsconfig.app.json"
+        "tsConfigPath": "apps/meetup/tsconfig.app.json"
       }
     },
-    "authorization-microservice": {
+    "authorization": {
       "type": "application",
-      "root": "apps/authorization-microservice",
+      "root": "apps/authorization",
       "entryFile": "main",
-      "sourceRoot": "apps/authorization-microservice/src",
+      "sourceRoot": "apps/authorization/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/authorization-microservice/tsconfig.app.json"
+        "tsConfigPath": "apps/authorization/tsconfig.app.json"
       }
     },
     "common": {

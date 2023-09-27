@@ -9,15 +9,16 @@ export class AwsService {
   private readonly route: string;
 
   constructor(@Inject('AWS_OPTIONS') private readonly awsOptions: AwsOptions) {
+    const { accessKeyId, secretAccessKey, Bucket, debug, route } = this.awsOptions;
     this.s3 = new EasyYandexS3({
       auth: {
-        accessKeyId: this.awsOptions.accessKeyId,
-        secretAccessKey: this.awsOptions.secretAccessKey,
+        accessKeyId,
+        secretAccessKey,
       },
-      Bucket: this.awsOptions.Bucket,
-      debug: this.awsOptions.debug,
+      Bucket,
+      debug,
     });
-    this.route = this.awsOptions.route;
+    this.route = route;
   }
 
   async upload(file: Express.Multer.File, filename: string): Promise<boolean> {

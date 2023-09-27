@@ -1,11 +1,12 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { JwtPayloadDto, YandexUser } from '@app/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import {
   JoiValidationPipe,
   JwtAuthGuard,
   LocalAuthGuard,
   RefreshGuard,
+  TokensFromRequest,
   UserFromRequest,
   YandexAuthGuard,
   setAuthCookie,
@@ -20,26 +21,21 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('registration')
-  @HttpCode(HttpStatus.CREATED)
-  public async registration(
+  @HttpCode(HttpStatus.OK)
+  public async register(
     @Body(new JoiValidationPipe(LocalRegistrationSchema)) createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    const tokens = await this.authService.registration(createUserDto);
+    const tokens = await this.authService.register(createUserDto);
     setAuthCookie(res, tokens);
-    return;
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('local/login')
   @HttpCode(HttpStatus.OK)
-  public async localLogin(
-    @UserFromRequest() user: UserEntity,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<void> {
+  public async localLogin(@UserFromRequest() user: UserEntity, @Res({ passthrough: true }) res: Response): Promise<void> {
     const tokens = await this.authService.localLogin(user);
     setAuthCookie(res, tokens);
-    return;
   }
 
   @UseGuards(YandexAuthGuard)
@@ -59,13 +55,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   public async logout(
     @UserFromRequest() userPayload: JwtPayloadDto,
-    @Req() req: Request,
+    @TokensFromRequest('refreshToken') token: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    const { refreshToken } = req?.cookies['auth-cookie'];
-    await this.authService.logout(userPayload, refreshToken);
+    await this.authService.logout(userPayload, token);
     setAuthCookie(res, null);
-    return;
   }
 
   @UseGuards(RefreshGuard)
@@ -73,12 +67,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   public async refresh(
     @UserFromRequest() userPayload: JwtPayloadDto,
-    @Req() req: Request,
+    @TokensFromRequest('refreshToken') token: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    const { refreshToken } = req?.cookies['auth-cookie'];
-    const tokens = await this.authService.refresh(userPayload, refreshToken);
+    const tokens = await this.authService.refresh(userPayload, token);
     setAuthCookie(res, tokens);
-    return;
   }
 }
