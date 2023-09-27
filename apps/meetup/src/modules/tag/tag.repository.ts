@@ -1,53 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { TransactionClient } from '../../common';
-import { TagEntity, TagCreationAttrs } from './types';
+import { TagEntity } from './types';
 
 @Injectable()
 export class TagRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async readById(id: number, transaction?: TransactionClient): Promise<TagEntity> {
+  async readMany(titles: string[], transaction: TransactionClient): Promise<TagEntity[]> {
     const executer = transaction ? transaction : this.prisma;
-    const tag = await executer.tags.findUnique({
-      where: { id },
+    const tags = await executer.tags.findMany({
+      where: { OR: titles.map((title) => ({ title })) },
     });
-    return tag;
+    return tags;
   }
 
-  async readByTitle(title: string, transaction?: TransactionClient) {
+  async createMany(titles: string[], transaction?: TransactionClient): Promise<void> {
     const executer = transaction ? transaction : this.prisma;
-    const tag = await executer.tags.findUnique({
-      where: { title },
+    await executer.tags.createMany({
+      data: titles.map((title) => ({ title })),
+      skipDuplicates: true,
     });
-    return tag;
   }
 
-  async create(tagCreationAttrs: TagCreationAttrs, transaction?: TransactionClient): Promise<TagEntity> {
+  async getRelatedTags(tags: TagEntity[], transaction?: TransactionClient): Promise<TagEntity[]> {
     const executer = transaction ? transaction : this.prisma;
-    const createdTag = await executer.tags.create({
-      data: {
-        title: tagCreationAttrs.title,
-      },
-    });
-    return createdTag;
-  }
-
-  async isRelated(id: number, transaction?: TransactionClient): Promise<boolean> {
-    const executer = transaction ? transaction : this.prisma;
-    const count = await executer.meetupsToTags.count({
+    const relatedTags = await executer.tags.findMany({
       where: {
-        tagId: id,
+        meetups: {
+          some: { OR: tags.map((tag) => ({ tagId: tag.id })) },
+        },
       },
     });
-
-    return count ? true : false;
+    return relatedTags;
   }
 
-  async deleteById(id: number, transaction?: TransactionClient): Promise<void> {
+  async deleteMany(tags: TagEntity[], transaction?: TransactionClient): Promise<void> {
     const executer = transaction ? transaction : this.prisma;
-    await executer.tags.delete({
-      where: { id },
+    await executer.tags.deleteMany({
+      where: { OR: tags.map((tag) => ({ id: tag.id })) },
     });
   }
 }

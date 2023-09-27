@@ -1,40 +1,25 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
+import { Injectable } from '@nestjs/common';
 import { TransactionClient } from '../../common';
 import { TagRepository } from './tag.repository';
-import { TagEntity, TagCreationAttrs } from './types';
-import { CreateTagDto } from './dto';
+import { TagEntity } from './types';
 
 @Injectable()
 export class TagService {
   constructor(private readonly tagRepository: TagRepository) {}
 
-  async readById(id: number, transaction?: TransactionClient): Promise<TagEntity> {
-    const tag = await this.tagRepository.readById(id, transaction);
-    return tag;
+  async readMany(titles: string[], transaction: TransactionClient): Promise<TagEntity[]> {
+    return await this.tagRepository.readMany(titles, transaction);
   }
 
-  async readByTitle(title: string, transaction?: TransactionClient): Promise<TagEntity> {
-    const tag = await this.tagRepository.readByTitle(title, transaction);
-    return tag;
+  async createMany(titles: string[], transaction?: TransactionClient): Promise<void> {
+    await this.tagRepository.createMany(titles, transaction);
   }
 
-  async create(createTagDto: CreateTagDto, transaction?: TransactionClient): Promise<TagEntity> {
-    const tagCreationAttrs: TagCreationAttrs = { ...createTagDto };
-    const createdTag = await this.tagRepository.create(tagCreationAttrs, transaction);
-    return createdTag;
+  async getRelatedTags(tags: TagEntity[], transaction?: TransactionClient): Promise<TagEntity[]> {
+    return await this.tagRepository.getRelatedTags(tags, transaction);
   }
 
-  async isRelated(id: number, transaction?: TransactionClient): Promise<boolean> {
-    return await this.tagRepository.isRelated(id, transaction);
-  }
-
-  async deleteById(id: number, transaction?: TransactionClient): Promise<void> {
-    const existingTag = await this.tagRepository.readById(id, transaction);
-    if (!existingTag) {
-      throw new RpcException({ message: `The specified tag does not exist`, statusCode: HttpStatus.BAD_REQUEST });
-    }
-
-    await this.tagRepository.deleteById(id, transaction);
+  async deleteMany(tags: TagEntity[], transaction?: TransactionClient): Promise<void> {
+    await this.tagRepository.deleteMany(tags, transaction);
   }
 }

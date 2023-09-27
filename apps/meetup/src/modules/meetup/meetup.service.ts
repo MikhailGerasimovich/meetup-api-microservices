@@ -35,19 +35,13 @@ export class MeetupService {
     return result;
   }
 
-  async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto): Promise<MeetupEntity> {
+  async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto) /*: Promise<MeetupEntity>*/ {
     const transactionResult = await this.prisma.$transaction(async (transaction: TransactionClient) => {
       const tags = await this.createTagsIfNotExist(createMeetupDto.tags, transaction);
-
       const meetupCreationAttrs: MeetupCreationAttrs = {
-        title: createMeetupDto.title,
-        description: createMeetupDto.description,
-        date: createMeetupDto.date,
-        place: createMeetupDto.place,
-        latitude: createMeetupDto.latitude,
-        longitude: createMeetupDto.longitude,
-        tags: tags,
+        ...createMeetupDto,
         organizerId: organizer.id,
+        tags,
       };
 
       const createdMeetup = await this.meetupRepository.create(meetupCreationAttrs, transaction);
@@ -134,32 +128,24 @@ export class MeetupService {
         });
       }
 
-      const tags = existingMeetup.tags.map((obj) => obj.tag);
       await this.meetupRepository.deleteById(id, transaction);
+      const tags = existingMeetup.tags.map((obj) => obj.tag);
       await this.deleteUnrelatedTags(tags, transaction);
       await this.meetupSearch.delete(id);
     });
   }
 
   private async createTagsIfNotExist(tagsTitle: string[], transaction?: TransactionClient): Promise<TagEntity[]> {
-    const tags = [];
-    for await (let title of tagsTitle) {
-      const existingTag = await this.tagService.readByTitle(title, transaction);
-      if (!existingTag) {
-        tags.push(await this.tagService.create({ title: title }, transaction));
-        continue;
-      }
-      tags.push(existingTag);
-    }
-    return tags;
+    await this.tagService.createMany(tagsTitle, transaction);
+    return await this.tagService.readMany(tagsTitle, transaction);
   }
 
-  private async deleteUnrelatedTags(tags: TagEntity[], transaction?: TransactionClient) {
-    for await (let tag of tags) {
-      const isRelatedTag = await this.tagService.isRelated(tag.id, transaction);
-      if (!isRelatedTag) {
-        await this.tagService.deleteById(tag.id, transaction);
-      }
+  private async deleteUnrelatedTags(tags: TagEntity[], transaction?: TransactionClient): Promise<void> {
+    const relatedTags = await this.tagService.getRelatedTags(tags, transaction);
+    const relatedTagsId = relatedTags.map((tag) => tag.id);
+    const tagsToDelete = tags.filter((tag) => !relatedTagsId.includes(tag.id));
+    if (tagsToDelete.length != 0) {
+      await this.tagService.deleteMany(tagsToDelete, transaction);
     }
   }
 }
