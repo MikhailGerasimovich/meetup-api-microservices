@@ -20,9 +20,8 @@ export class AuthService {
   async validateUser(supposedEmail: string, pass: string): Promise<JwtPayloadDto> {
     const selectFields = ['password', 'role', 'provider'];
     const candidate = await this.userService.readByEmail(supposedEmail, selectFields);
-    const { id, role, password, provider } = candidate;
-    if (candidate && provider == 'local' && compareSync(pass, password)) {
-      return { id, role };
+    if (candidate && candidate.provider == 'local' && compareSync(pass, candidate.password)) {
+      return { id: candidate.id, role: candidate.role };
     }
 
     throw new RpcException({ message: 'wrong login or password', statusCode: HttpStatus.BAD_REQUEST });

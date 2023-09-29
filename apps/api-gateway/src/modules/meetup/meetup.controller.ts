@@ -13,14 +13,19 @@ import {
   ParseIntPipe,
   Res,
 } from '@nestjs/common';
-import { JwtPayloadDto, ReadAllResult } from '@app/common';
+import { Response } from 'express';
+import { BaseReadAllDto, JwtPayloadDto, ReadAllResult } from '@app/common';
+import { ApiCookieAuth, ApiExtraModels, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { getAllMeetupSchemaOptions } from '../../common';
+import { MeetupSearchResult, MeetupType, Report } from './types';
 import { JoiValidationPipe, JwtAuthGuard, RolesGuard, UserFromRequest } from '../../common';
 import { MeetupService } from './meetup.service';
 import { CreateMeetupSchema, ReadAllMeetupSchema, ReportSchema, SearchMeetupSchema, UpdateMeetupSchema } from './schemas';
-import { CreateMeetupDto, ReadAllMeetupDto, UpdateMeetupDto } from './dto';
-import { MeetupSearchResult, MeetupType, ReportType } from './types';
-import { Response } from 'express';
+import { CreateMeetupDto, ReadAllMeetupDto, SearchMeetupDto, UpdateMeetupDto } from './dto';
 
+@ApiTags('Meetup')
+@ApiCookieAuth()
+@ApiExtraModels(ReadAllMeetupDto, CreateMeetupDto, UpdateMeetupDto, BaseReadAllDto, MeetupType)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('meetup')
 export class MeetupController {
@@ -28,6 +33,10 @@ export class MeetupController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all meetups' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success', schema: getAllMeetupSchemaOptions })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   async readAll(
     @Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto,
   ): Promise<ReadAllResult<MeetupType>> {
@@ -38,16 +47,24 @@ export class MeetupController {
 
   @Get('search')
   @HttpCode(HttpStatus.OK)
-  async search(@Query(new JoiValidationPipe(SearchMeetupSchema)) query: any): Promise<MeetupSearchResult> {
-    const { text } = query;
+  @ApiOperation({ summary: 'Get meetups using full text search' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  async search(@Query(new JoiValidationPipe(SearchMeetupSchema)) search: SearchMeetupDto): Promise<MeetupSearchResult> {
+    const { text } = search;
     const searchResult = await this.meetupService.search(text);
     return searchResult;
   }
 
   @Get('generate-report/:type')
+  @ApiOperation({ summary: 'Generate meetup reports pdf or csv' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   async csvReport(
     @Query(new JoiValidationPipe(ReadAllMeetupSchema)) readAllMeetupDto: ReadAllMeetupDto,
-    @Param(new JoiValidationPipe(ReportSchema)) report: ReportType,
+    @Param(new JoiValidationPipe(ReportSchema)) report: Report,
     @Res() res: Response,
   ) {
     const { pagination, sorting, ...filters } = readAllMeetupDto;
@@ -56,6 +73,10 @@ export class MeetupController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get meetup by id' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: MeetupType })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   async readById(@Param('id', ParseIntPipe) id: number): Promise<MeetupType> {
     const meetup = await this.meetupService.readById(id);
     return meetup;
@@ -63,6 +84,10 @@ export class MeetupController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create a new meetup for the user' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Success', type: MeetupType })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   async create(
     @Body(new JoiValidationPipe(CreateMeetupSchema)) createMeetupDto: CreateMeetupDto,
     @UserFromRequest() organizer: JwtPayloadDto,
@@ -73,6 +98,10 @@ export class MeetupController {
 
   @Post('join/:id')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Register for the meetup' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Success', type: MeetupType })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   public async joinToMeetup(
     @Param('id', ParseIntPipe) meetupId: number,
     @UserFromRequest() member: JwtPayloadDto,
@@ -83,6 +112,10 @@ export class MeetupController {
 
   @Post('leave/:id')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Leave from meetup' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Success', type: MeetupType })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   public async leaveFromMeetup(
     @Param('id', ParseIntPipe) meetupId: number,
     @UserFromRequest() member: JwtPayloadDto,
@@ -93,6 +126,10 @@ export class MeetupController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update meetup by id' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: MeetupType })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(UpdateMeetupSchema)) updateMeetupDto: UpdateMeetupDto,
@@ -104,6 +141,10 @@ export class MeetupController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete meetup by id' })
+  @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Success' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   async deleteById(@Param('id', ParseIntPipe) id: number, @UserFromRequest() jwtPayload: JwtPayloadDto): Promise<void> {
     await this.meetupService.deleteById(id, jwtPayload);
   }
