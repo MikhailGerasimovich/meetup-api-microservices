@@ -10,10 +10,10 @@ services:
   meetup-microservice:
     build:
       context: .
-      dockerfile: ./apps/meetup-microservice/Dockerfile
-    command: npm run start:dev meetup-microservice && generate:meetup:docker && migrate:meetup:docker && seed:meetup:docker
+      dockerfile: ./apps/meetup/Dockerfile
+    command: npm run start:dev meetup && generate:meetup:docker && migrate:meetup:docker && seed:meetup:docker
     env_file:
-      - ./apps/meetup-microservice/.envDocker
+      - ./apps/meetup/.envDocker
     depends_on:
       - postgres-meetup
       - rabbitmq
@@ -24,10 +24,10 @@ services:
   authorization-microservice:
     build:
       context: .
-      dockerfile: ./apps/authorization-microservice/Dockerfile
-    command: npm run start:dev authorization-microservice && generate:auth:docker && migrate:auth:docker && seed:auth:docker
+      dockerfile: ./apps/authorization/Dockerfile
+    command: npm run start:dev authorization && generate:auth:docker && migrate:auth:docker && seed:auth:docker
     env_file:
-      - ./apps/authorization-microservice/.envDocker
+      - ./apps/authorization/.envDocker
     depends_on:
       - postgres-auth
       - rabbitmq
