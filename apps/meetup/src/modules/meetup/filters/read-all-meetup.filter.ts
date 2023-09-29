@@ -11,6 +11,10 @@ export const getMeetupFilters = (filterOptions: any) => {
       geoFilters['geoposition'] = value;
       continue;
     }
+    if (key == 'organizerId') {
+      meetupFilters[key] = { contains: Number(value) };
+      continue;
+    }
     meetupFilters[key] = { contains: value };
   }
 

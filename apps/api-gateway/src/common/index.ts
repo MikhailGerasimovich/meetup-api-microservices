@@ -16,3 +16,8 @@ export * from './pipes/image-validation.pipe';
 export * from './utils/set-auth-cookie';
 
 export * from './utils/send-message';
+
+export * from './configs/swagger.config';
+
+export * from './swagger/meetup.options';
+export * from './swagger/user.options';

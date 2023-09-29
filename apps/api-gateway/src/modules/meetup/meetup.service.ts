@@ -6,7 +6,7 @@ import * as pdf from 'html-pdf';
 import { Response } from 'express';
 import { JwtPayloadDto, METADATA, ReadAllResult } from '@app/common';
 import { MEETUP, sendMessage } from '../../common';
-import { IReadAllMeetupOptions, MeetupSearchResult, MeetupType, ReportType } from './types';
+import { IReadAllMeetupOptions, MeetupSearchResult, MeetupType, Report } from './types';
 import { CreateMeetupDto, UpdateMeetupDto } from './dto';
 import { ConfigService } from '@nestjs/config';
 
@@ -29,7 +29,7 @@ export class MeetupService {
     return searchResult;
   }
 
-  async generateReport(report: ReportType, readAllMeetupOptions: IReadAllMeetupOptions, res: Response): Promise<void> {
+  async generateReport(report: Report, readAllMeetupOptions: IReadAllMeetupOptions, res: Response): Promise<void> {
     if (report.type == 'pdf') {
       await this.generatePdfReport(readAllMeetupOptions, res);
     } else if (report.type == 'csv') {
