@@ -7,7 +7,7 @@ import { MeetupModule } from './modules/meetup/meetup.module';
 import { DatabaseModule } from './modules/database/database.module';
 
 const DefineConfigModule = ConfigModule.forRoot({
-  envFilePath: './apps/meetup/.env',
+  envFilePath: './apps/meetup/.envDocker',
   isGlobal: true,
 });
 

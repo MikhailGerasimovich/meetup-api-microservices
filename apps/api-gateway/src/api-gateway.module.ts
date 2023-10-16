@@ -11,7 +11,7 @@ import { MeetupModule } from './modules/meetup/meetup.module';
 import { AUTH, MEETUP } from './common';
 
 const DefineConfigModule = ConfigModule.forRoot({
-  envFilePath: './apps/api-gateway/.env',
+  envFilePath: './apps/api-gateway/.envDocker',
   isGlobal: true,
 });
 
@@ -65,15 +65,7 @@ const DefineJwtModule = JwtModule.registerAsync({
 });
 
 @Module({
-  imports: [
-    DefineConfigModule,
-    DefineClientModule,
-    DefineJwtModule,
-    PassportModule,
-    AuthModule,
-    UserModule,
-    MeetupModule,
-  ],
+  imports: [DefineConfigModule, DefineClientModule, DefineJwtModule, PassportModule, AuthModule, UserModule, MeetupModule],
   providers: [
     {
       provide: APP_FILTER,

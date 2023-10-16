@@ -35,7 +35,7 @@ export class MeetupService {
     return result;
   }
 
-  async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto) /*: Promise<MeetupEntity>*/ {
+  async create(createMeetupDto: CreateMeetupDto, organizer: JwtPayloadDto): Promise<MeetupEntity> {
     const transactionResult = await this.prisma.$transaction(async (transaction: TransactionClient) => {
       const tags = await this.createTagsIfNotExist(createMeetupDto.tags, transaction);
       const meetupCreationAttrs: MeetupCreationAttrs = {

@@ -7,7 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 
 const DefineConfigModule = ConfigModule.forRoot({
-  envFilePath: './apps/authorization/.env',
+  envFilePath: './apps/authorization/.envDocker',
   isGlobal: true,
   cache: true,
 });

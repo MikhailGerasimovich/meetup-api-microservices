@@ -6,22 +6,10 @@ services:
     image: rabbitmq
     ports:
       - '5672:5672'
+    networks:
+      - elastic
 
-  meetup-microservice:
-    build:
-      context: .
-      dockerfile: ./apps/meetup/Dockerfile
-    command: npm run start:dev meetup && generate:meetup:docker && migrate:meetup:docker && seed:meetup:docker
-    env_file:
-      - ./apps/meetup/.envDocker
-    depends_on:
-      - postgres-meetup
-      - rabbitmq
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-
-  authorization-microservice:
+  auth:
     build:
       context: .
       dockerfile: ./apps/authorization/Dockerfile
@@ -34,8 +22,31 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    ports:
+      - 4001:4001
+    networks:
+      - elastic
 
-  api-gateway:
+  meetup:
+    build:
+      context: .
+      dockerfile: ./apps/meetup/Dockerfile
+    command: npm run start:dev meetup && generate:meetup:docker && migrate:meetup:docker && seed:meetup:docker
+    env_file:
+      - ./apps/meetup/.envDocker
+    depends_on:
+      - postgres-meetup
+      - rabbitmq
+      - elasticsearch
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 4000:4000
+    networks:
+      - elastic
+
+  gateway:
     build:
       context: .
       dockerfile: ./apps/api-gateway/Dockerfile
@@ -43,16 +54,19 @@ services:
     env_file:
       - ./apps/api-gateway/.envDocker
     depends_on:
-      - authorization-microservice
+      - meetup
+      - auth
       - rabbitmq
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
       - 3000:3000
+    networks:
+      - elastic
 
   postgres-auth:
-    image: postgres:13.5
+    image: postgis/postgis:13-3.4
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -64,9 +78,11 @@ services:
       - postgres:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - elastic
 
   postgres-meetup:
-    image: postgres:13.5
+    image: postgis/postgis:13-3.4
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -82,42 +98,39 @@ services:
       - '5433:5433'
     command:
       - -p 5433
+    networks:
+      - elastic
 
   elasticsearch:
-    container_name: es-container
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.1
-    environment:
-      - xpack.security.enabled=false
-      - "discovery.type=single-node"
-    volumes:
-      - ./esdata:/usr/share/elasticsearch/data
-    networks:
-      - es-net
+    image: elasticsearch:8.10.2
     ports:
       - 9200:9200
-
-  kibana:
-    container_name: kb-container
-    image: docker.elastic.co/kibana/kibana:8.9.1
     environment:
-      - ELASTICSEARCH_HOSTS=http://es-container:9200
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      discovery.type: 'single-node'
+      xpack.security.enabled: 'true'
+      ELASTIC_PASSWORD: 'rxI2de2zHgnmKYkfToDh'
     networks:
-      - es-net
-    depends_on:
-      - elasticsearch
-    ports:
-      - 5601:5601
-    volumes:
-      - kibanadata:/usr/share/kibana/data
-
-networks:
-  es-net:
-    driver: bridge
-
+      - elastic
+    mem_limit: 1g
+  # kibana:
+  #   container_name: kb-container
+  #   image: docker.elastic.co/kibana/kibana:8.9.1
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #   networks:
+  #     - es-net
+  #   depends_on:
+  #     - elasticsearch
+  #   ports:
+  #     - 5601:5601
+  #   volumes:
+  #     - kibanadata:/usr/share/kibana/data
 volumes:
   postgres:
-  esdata:
-    driver: local
-  kibanadata:
-    driver: local
+
+
+networks:
+  elastic:
+
+

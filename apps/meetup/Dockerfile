@@ -6,12 +6,12 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY . . 
+RUN npm i dotenv-cli -g
 
-RUN npm i dotenv-cli
+COPY . . 
 
 RUN  npm run generate:meetup:docker 
 
-RUN npm run build
+RUN npm run build meetup
 
 CMD ["npm", "run", "docker:run"]
