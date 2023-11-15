@@ -13,38 +13,30 @@ services:
     build:
       context: .
       dockerfile: ./apps/authorization/Dockerfile
-    command: npm run start:dev authorization && generate:auth:docker && migrate:auth:docker && seed:auth:docker
+    command: npm run docker:auth
     env_file:
       - ./apps/authorization/.envDocker
     depends_on:
       - postgres-auth
       - rabbitmq
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    ports:
-      - 4001:4001
     networks:
       - elastic
+      - auth
 
   meetup:
     build:
       context: .
       dockerfile: ./apps/meetup/Dockerfile
-    command: npm run start:dev meetup && generate:meetup:docker && migrate:meetup:docker && seed:meetup:docker
+    command: npm run docker:meetup
     env_file:
       - ./apps/meetup/.envDocker
     depends_on:
       - postgres-meetup
       - rabbitmq
       - elasticsearch
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    ports:
-      - 4000:4000
     networks:
       - elastic
+      - meetup
 
   gateway:
     build:
@@ -57,9 +49,6 @@ services:
       - meetup
       - auth
       - rabbitmq
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
       - 3000:3000
     networks:
@@ -75,11 +64,9 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
     volumes:
-      - postgres:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
+      - auth:/var/lib/postgresql/data
     networks:
-      - elastic
+      - auth
 
   postgres-meetup:
     image: postgis/postgis:13-3.4
@@ -89,17 +76,11 @@ services:
       - POSTGRES_PASSWORD=957483
       - POSTGRES_DB=meetup_microservice_db
       - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5433
-    expose:
-      - '5433'
+      - POSTGRES_PORT=5432
     volumes:
-      - postgres:/var/lib/postgresql/data
-    ports:
-      - '5433:5433'
-    command:
-      - -p 5433
+      - meetup:/var/lib/postgresql/data
     networks:
-      - elastic
+      - meetup
 
   elasticsearch:
     image: elasticsearch:8.10.2
@@ -112,25 +93,25 @@ services:
     networks:
       - elastic
     mem_limit: 1g
-  # kibana:
-  #   container_name: kb-container
-  #   image: docker.elastic.co/kibana/kibana:8.9.1
-  #   environment:
-  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  #   networks:
-  #     - es-net
-  #   depends_on:
-  #     - elasticsearch
-  #   ports:
-  #     - 5601:5601
-  #   volumes:
-  #     - kibanadata:/usr/share/kibana/data
+    cpus: '1'
+
+  kibana:
+    image: kibana:8.10.2
+    environment:
+      - ELASTICSEARCH_SERVICEACCOUNTTOKEN="AAEAAWVsYXN0aWMva2liYW5hL3Rva2VuMTpUUU9xaFl5c1JmZXBzVGJtMWhFZnl3"
+    ports:
+      - 5601:5601
+    networks:
+      - elastic
+    mem_limit: 1g
+    cpus: '1'
+
 volumes:
-  postgres:
+  auth:
+  meetup:
 
 
 networks:
+  auth:
+  meetup:
   elastic:
-
-

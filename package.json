@@ -31,7 +31,9 @@
     "generate:meetup:docker": "dotenv -e ./apps/meetup/.envDocker -- npx prisma generate --schema=./apps/meetup/prisma/schema.prisma",
     "seed:auth:docker": "dotenv -e ./apps/meetup/.envDocker -- ts-node ./apps/authorization/prisma/seed.ts",
     "seed:meetup:docker": "dotenv -e ./apps/meetup/.envDocker -- ts-node ./apps/meetup/prisma/seed.ts",
-    "db:docker": "npm run migrate:auth:docker && npm run migrate:meetup:docker && npm run generate:auth:docker && npm run generate:meetup:docker && npm run seed:auth:docker && npm run seed:meetup:docker"
+    "db:docker": "npm run migrate:auth:docker && npm run migrate:meetup:docker && npm run generate:auth:docker && npm run generate:meetup:docker && npm run seed:auth:docker && npm run seed:meetup:docker", 
+    "docker:auth": "npm run generate:auth:docker; npm run migrate:auth:docker; npm run seed:auth:docker; npm run start:dev authorization",
+    "docker:meetup": "npm run generate:meetup:docker; npm run migrate:meetup:docker; npm run seed:meetup:docker; npm run start:dev meetup"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.9.0",

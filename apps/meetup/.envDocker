@@ -1,5 +1,5 @@
 #MEETUP_DATABASE
-MEETUP_DATABASE_URL="postgresql://postgres:957483@postgres-meetup:5433/meetup_microservice_db?schema=public"
+MEETUP_DATABASE_URL="postgresql://postgres:957483@postgres-meetup:5432/meetup_microservice_db?schema=public"
 
 #MEETUP_MICROSERVICE
 RMQ_URL_MEETUP_MICROSERVICE="amqp://rabbitmq:5672"
